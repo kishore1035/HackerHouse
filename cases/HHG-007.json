@@ -31,24 +31,24 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 5 confirmed fraud (account_takeover)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 5 confirmed fraud (account_takeover)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
           "CC-0639",
           "CC-0835",
           "CC-1620",
-          "CC-2012",
-          "CC-2483"
+          "CC-2483",
+          "CC-2012"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 5: Account takeover; R5 Card testing.; R10 Never `BLOCK_ALL_CARDS`",
+        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 5: Account takeover; R10 Never `BLOCK_ALL_CARDS`",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "pattern:004",
           "policy:009",
+          "pattern:004",
           "policy:014"
         ]
       },
@@ -69,10 +69,10 @@
       "CC-0639",
       "CC-0835",
       "CC-1620",
-      "CC-2012",
-      "CC-2483"
+      "CC-2483",
+      "CC-2012"
     ],
-    "summary": "Case HHG-007 was initiated following a real-time model alert on transaction 3514948 for $111.92 on card C09933-K2 belonging to customer C09933. The in-person transaction occurred on 2016-12-05 00:46:14 in region 264 for product W while parallel home activity continued. Upon verification, the customer stated they did not make the purchase and remained in physical possession of the card. With a calibrated fraud probability of 0.98 and five matching historical account takeover cases, the incident was confirmed as fraud. In response, a fraud case was created and card C09933-K2 was blocked.",
+    "summary": "Case HHG-007 was initiated after transaction 3514948 for $111.92 on card C09933-K2 in billing region 264 was flagged by the real-time model with a risk score of 0.87 on 2016-12-05 00:46:14. Customer C09933 confirmed they still hold the card and did not make the in-person transaction. Supervised graph-derived modeling calibrated the fraud probability at 0.98, supported by 5 out of 5 similar historical cases being confirmed account takeover. The incident is confirmed as fraud under Pattern 5 with total exposure of $111.92, leading to the card being blocked.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-007"
   },
@@ -113,7 +113,7 @@
         "reason": "R2: customer dispute opens a case"
       }
     ],
-    "what_changed": "Initial verification and step-up authentication actions were transitioned to blocking card C09933-K2 after the customer confirmed the transaction was unauthorized. The action was restricted to the specific card pursuant to policy rule R10 rather than blocking all cards."
+    "what_changed": "Initial actions focused on customer verification and step-up authentication, but upon the customer confirming unauthorized activity, actions progressed to blocking the specific compromised card. In accordance with policy R10, only the affected card was blocked rather than all cards."
   },
   "sar": {
     "file": false,
@@ -124,7 +124,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.98 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 6,
-  "tokens": 2771,
-  "latency_s": 11.0
+  "tool_calls": 7,
+  "tokens": 2822,
+  "latency_s": 13.4
 }

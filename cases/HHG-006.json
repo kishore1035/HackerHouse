@@ -70,14 +70,14 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 4 confirmed fraud (none, undocumented)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 5 confirmed fraud (undocumented)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-5008",
-          "CC-3907",
-          "CC-4124",
           "CC-3841",
+          "CC-4124",
+          "CC-3907",
+          "CC-3748",
           "CC-4086"
         ]
       },
@@ -105,13 +105,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-5008",
-      "CC-3907",
-      "CC-4124",
       "CC-3841",
+      "CC-4124",
+      "CC-3907",
+      "CC-3748",
       "CC-4086"
     ],
-    "summary": "Customer C07297 reported unauthorized activity on card C07297-K1 after flagging transaction 3476682 for $482.12. Investigation identified an episode of 4 online purchases for product C occurring between 2016-11-21 20:00:00 and 2016-11-21 20:30:00, totaling $1,906.07 across regions 264 and 476. The activity represents structuring, with each transaction kept between $400 and $500 to stay beneath a $500 authorization threshold. With a calibrated fraud probability of 0.92 from a new device profile D000061, the case was confirmed as fraud, card C07297-K1 was blocked, and a SAR was initiated under case HHG-006.",
+    "summary": "Case HHG-006 involves customer C07297 and card C07297-K1 with a confirmed fraud verdict and an undocumented structuring pattern. The investigation was initiated after customer C07297 reported that online transaction 3476682 for $482.12 was unauthorized. An episode of four online transactions for product C occurred on 2016-11-21 between 20:00:00 and 20:30:00 across regions 264 and 476, totaling $1,906.07. Each charge was structured between $400 and $500 to stay beneath a $500 authorization threshold using a new device profile. The calibrated fraud probability is 0.92, supported by five matching confirmed fraud cases in case memory.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-006"
   },
@@ -166,7 +166,7 @@
   "sar": {
     "file": true,
     "reason": "exposure $1,906.07 exceeds $1,000; pattern is coordinated or undocumented (R9)",
-    "narrative": "This Suspicious Activity Report involves customer C07297 and credit card account C07297-K1. Customer C07297 initiated a fraud dispute regarding an unrecognized online transaction 3476682 in the amount of $482.12. A subsequent review revealed an episode of 4 online transactions conducted on 2016-11-21 between 20:00:00 and 20:30:00. The transactions were executed online for product C across region 264 and region 476. Specifically, transactions 3476602 ($478.95), 3476633 ($456.96), 3476665 ($488.04), and 3476682 ($482.12) resulted in a total exposure of $1,906.07. The activity reflects structuring behavior, as all 4 purchases were kept between $400 and $500 within a 30-minute window to avoid a $500 control threshold. The flagged transactions significantly deviated from the card baseline of 101 prior transactions averaging $115.15 (z=2.5). Furthermore, the transactions originated from device profile D000061 (Trident/7.0 | Windows 7 | ie 11.0 for desktop | 1920x1080), which was marked as new for this account. Supervised graph feature modeling calculated a calibrated fraud probability of 0.92, supported by case memory where 4 of 5 similar closed cases were confirmed fraud. Under policy rule R9, a SAR is filed because the total exposure of $1,906.07 exceeds $1,000 under an undocumented pattern.",
+    "narrative": "This Suspicious Activity Report relates to unauthorized card-not-present activity on card C07297-K1 associated with customer C07297. On 2016-11-21, between 20:00:00 and 20:30:00, four online transactions for product C were conducted totaling $1,906.07 in exposure. The transactions were transaction 3476602 for $478.95 in region 264, transaction 3476633 for $456.96 in region 476, transaction 3476665 for $488.04 in region 476, and transaction 3476682 for $482.12 in region 264. Customer C07297 notified the bank that they never made transaction 3476682 for $482.12 and requested a card review. The transactions were processed using device profile D000061 (Trident/7.0 | Windows 7 | ie 11.0 for desktop | 1920x1080), which was identified as new for this account. The flagged $482.12 transaction significantly deviated from the baseline of 101 prior transactions averaging $115.15 (z=2.5). The activity indicates an undocumented structuring pattern where four online purchases were made within 30 minutes, each kept just under the $500 threshold. A supervised model estimated a calibrated fraud probability of 0.92, and the five most similar prior closed cases were confirmed fraud. Filing is warranted under rule R9 as total exposure exceeds $1,000 for an undocumented coordinated pattern. The bank has initiated case creation, report filing, analyst escalation, and card blocking.",
     "subjects": [
       "C07297",
       "C07297-K1"
@@ -178,7 +178,7 @@
     ]
   },
   "stop_reason": "Probability 0.92 with 4 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 5592,
-  "latency_s": 16.4
+  "tool_calls": 9,
+  "tokens": 5491,
+  "latency_s": 17.3
 }

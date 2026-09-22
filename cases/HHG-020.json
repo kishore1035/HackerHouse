@@ -37,25 +37,25 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-1284",
-          "CC-1287",
+          "CC-4259",
           "CC-1214",
           "CC-0120",
-          "CC-4259"
+          "CC-1287",
+          "CC-1284"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 1: Card testing",
+        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 1: Card testing; Pattern 3: Card-not-present fraud from a new device",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "pattern:001",
           "policy:009",
-          "pattern:000"
+          "pattern:000",
+          "pattern:002"
         ]
       },
       {
@@ -72,13 +72,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-1284",
-      "CC-1287",
+      "CC-4259",
       "CC-1214",
       "CC-0120",
-      "CC-4259"
+      "CC-1287",
+      "CC-1284"
     ],
-    "summary": "Case HHG-020 was opened for customer C12265 after online transaction 3509359 for $125.08 on card C12265-K2 was flagged by the real-time model with a score of 0.52 from a new device. The transaction amount aligns well with historical baseline spending (82 prior transactions averaging $218.79, z=-0.2), and the device profile D000179 has zero confirmed fraud across 254 cards. Customer verification was performed, and the customer confirmed the transaction as an intended purchase. Consequently, the fraud probability was calibrated to 0.05, leading to a verdict of legitimate with no fraud reported.",
+    "summary": "Case HHG-020 was initiated after transaction 3509359 for $125.08 on card C12265-K2 (customer C12265) was flagged by the real-time model with a score of 0.52. The online transaction occurred on 2016-12-03 06:04:26 in region 264 using a new device profile D000179. Upon inquiry, the customer confirmed the purchase as an authorized intended purchase on a new device. Given the customer confirmation and a calibrated fraud probability of 0.05, the transaction was determined to be legitimate.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-020"
   },
@@ -114,7 +114,7 @@
         "reason": "R3: let the transaction stand"
       }
     ],
-    "what_changed": "Initial actions to create a case and verify with the customer transitioned to allowing the transaction and closing as no fraud once customer C12265 verified the legitimate purchase."
+    "what_changed": "Initial actions required customer verification and case creation, but following the customer's confirmation of the purchase, final actions shifted to allowing the transaction and closing the case as no fraud."
   },
   "sar": {
     "file": false,
@@ -125,7 +125,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.05 with 1 independent signal(s) and a customer confirms reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 2789,
-  "latency_s": 9.1
+  "tool_calls": 9,
+  "tokens": 2504,
+  "latency_s": 9.5
 }

@@ -103,8 +103,8 @@ class Investigator:
         sim, docs = self._graphrag(sig_txt)
         sim_ids = [s["case_id"] for s in sim]
         sim_fraud = sum(1 for s in sim if s["outcome"] == "confirmed_fraud") / max(len(sim), 1)
-        self.emit("memory", "GraphRAG: similar closed cases and policy passages retrieved",
-                  f"{len(sim)} similar closed cases ({sim_fraud:.0%} confirmed fraud): {', '.join(sim_ids)}; policy: {', '.join(x['section'] for x in docs[:3])}",
+        self.emit("memory", "GraphRAG: similar prior cases and policy passages retrieved",
+                  f"{len(sim)} similar prior cases, closed + agent memory ({sim_fraud:.0%} confirmed fraud): {', '.join(sim_ids)}; policy: {', '.join(x['section'] for x in docs[:3])}",
                   {"similar": sim, "policy": [x["section"] for x in docs]})
 
         # 4 ASSESS
@@ -212,10 +212,23 @@ class Investigator:
     def _graphrag(self, text):
         qv = llm.embed([text])[0]
         r = self.g.q("similar_cases", qv=qv, k=5)
+        dist = r[1]["distances"]
         sim = []
         for x in r[0]["cases"]:
             a = {k.split(".")[-1]: v for k, v in x["attributes"].items()}
-            sim.append({"case_id": x["v_id"], "outcome": a["outcome"], "pattern": a["pattern"], "notes": a["notes"], "exposure": a["exposure"]})
+            sim.append({"case_id": x["v_id"], "outcome": a["outcome"], "pattern": a["pattern"], "notes": a["notes"],
+                        "exposure": a["exposure"], "dist": dist.get(x["v_id"], 1.0)})
+        try:
+            # GraphRAG memory loop: retrieve the agent's own prior investigations alongside the closed-case history
+            r3 = self.g.q("similar_agent_cases", qv=qv, k=5)
+            dist3 = r3[1]["distances"]
+            for x in r3[0]["cases"]:
+                a = {k.split(".")[-1]: v for k, v in x["attributes"].items()}
+                sim.append({"case_id": x["v_id"], "outcome": "confirmed_fraud" if a["verdict"] == "fraud" else "cleared",
+                            "pattern": a["pattern"], "notes": a["summary"][:200], "exposure": a["exposure"], "dist": dist3.get(x["v_id"], 1.0)})
+        except Exception:
+            pass
+        sim = sorted(sim, key=lambda s: s["dist"])[:5]
         r2 = self.g.q("policy_search", qv=qv, k=4)
         docs = [{k.split(".")[-1]: v for k, v in x["attributes"].items()} | {"id": x["v_id"]} for x in r2[0]["chunks"]]
         return sim, docs
@@ -245,7 +258,7 @@ class Investigator:
         if recurring: ev.append({"claim": f"The same ${fl.TransactionAmt:,.2f} amount appears {recurring_n} time(s) earlier on this card under the same product code: recurring pattern (R7)", "source": "graph", "ref": "rule:recurring_amount(card_txns)", "entity_ids": [str(case["flagged_txn_id"])]})
         if sim:
             fr = sum(1 for s in sim if s["outcome"] == "confirmed_fraud")
-            ev.append({"claim": f"Case memory: {len(sim)} most similar closed cases, {fr} confirmed fraud ({', '.join(sorted({s['pattern'] for s in sim}))})", "source": "graph", "ref": "query:similar_cases(vector k=5)", "entity_ids": [s["case_id"] for s in sim]})
+            ev.append({"claim": f"Case memory: {len(sim)} most similar prior cases (closed + agent), {fr} confirmed fraud ({', '.join(sorted({s['pattern'] for s in sim}))})", "source": "graph", "ref": "query:similar_cases+similar_agent_cases(vector k=5)", "entity_ids": [s["case_id"] for s in sim]})
         if docs:
             ev.append({"claim": "Policy and typology passages grounding the decision: " + "; ".join(d["section"] for d in docs[:3]), "source": "document", "ref": "query:policy_search(vector k=4)", "entity_ids": [d["id"] for d in docs[:3]]})
         ev.append({"claim": f"Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability {p_raw:.2f}; calibrated to {p:.2f}. Undocumented V/C/D/M columns are used only as anonymous model inputs", "source": "graph", "ref": "model:fraud_gbm_v1", "entity_ids": []})

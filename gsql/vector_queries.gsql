@@ -8,6 +8,14 @@ CREATE OR REPLACE QUERY similar_cases(LIST<FLOAT> qv, INT k = 5) FOR GRAPH Fraud
   PRINT @@dist AS distances;
 }
 
+CREATE OR REPLACE QUERY similar_agent_cases(LIST<FLOAT> qv, INT k = 5) FOR GRAPH FraudGraph SYNTAX V2 {
+  /* GraphRAG step 1b: vector similarity over the agent's own prior investigations (case memory) */
+  MapAccum<VERTEX, FLOAT> @@dist;
+  Top = vectorSearch({AgentCase.emb}, qv, k, {distance_map: @@dist});
+  PRINT Top[Top.status, Top.verdict, Top.pattern, Top.probability, Top.exposure, Top.summary] AS cases;
+  PRINT @@dist AS distances;
+}
+
 CREATE OR REPLACE QUERY policy_search(LIST<FLOAT> qv, INT k = 4) FOR GRAPH FraudGraph SYNTAX V2 {
   /* GraphRAG step 2: vector similarity over fraud policy, pattern definitions and regulatory guidance */
   MapAccum<VERTEX, FLOAT> @@dist;
@@ -15,4 +23,4 @@ CREATE OR REPLACE QUERY policy_search(LIST<FLOAT> qv, INT k = 4) FOR GRAPH Fraud
   PRINT Top[Top.source, Top.section, Top.text] AS chunks;
   PRINT @@dist AS distances;
 }
-INSTALL QUERY similar_cases, policy_search
+INSTALL QUERY similar_cases, similar_agent_cases, policy_search

@@ -41,24 +41,24 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-4734",
           "CC-4591",
           "CC-3931",
+          "CC-4734",
           "CC-2937",
           "CC-4538"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 4: Out-of-region use; R5 Card testing.",
+        "claim": "Policy and typology passages grounding the decision: Pattern 5: Account takeover; Pattern 2: Card-not-present fraud; R5 Card testing.",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
+          "pattern:004",
           "pattern:001",
-          "pattern:003",
           "policy:009"
         ]
       },
@@ -76,13 +76,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-4734",
       "CC-4591",
       "CC-3931",
+      "CC-4734",
       "CC-2937",
       "CC-4538"
     ],
-    "summary": "Case HHG-003 was triggered by customer C08623 reporting an unauthorized $49.00 in-person transaction (txn 3530164) on card C08623-K2. An investigation revealed an episode of two in-person transactions (txns 3527215 and 3530164) between 2016-12-09 12:36:58 and 2016-12-10 13:01:21 totaling $108.00 in billing region 330. This activity matched an out-of-region pattern representing only 4.3% of prior card activity while home activity continued in parallel, resulting in a calibrated fraud probability of 0.95. Card C08623-K2 was blocked and a case was created, with no SAR filing required due to the low exposure.",
+    "summary": "Case HHG-003 was triggered when customer C08623 reported an unauthorized $49.00 in-person transaction (ID 3530164) on card C08623-K2. Analysis identified an episode of two transactions totaling $108.00 in region 330 between 2016-12-09 12:36:58 and 2016-12-10 13:01:21 for product W. Card-present activity in region 330 accounts for only 4.3% of prior activity while home activity continued in parallel, supporting a fraud probability of 0.95. The verdict is confirmed fraud under the out_of_region_use pattern, and actions to block the card and create a case were maintained.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-003"
   },
@@ -123,7 +123,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.95 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 6,
-  "tokens": 3297,
-  "latency_s": 10.8
+  "tool_calls": 7,
+  "tokens": 3025,
+  "latency_s": 10.6
 }

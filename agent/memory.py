@@ -11,8 +11,10 @@ def write_case(g, ans: dict, case: dict):
     conn = g.conn
     conn.upsertVertex("AgentCase", cid, {"case_ref": ans["case_id"], "status": c["status"], "verdict": c["verdict"], "pattern": c["pattern"], "probability": c["fraud_probability"],
                                           "exposure": c["exposure_usd"], "summary": c["summary"][:3000], "created_at": now, "updated_at": now, "record": json.dumps(rec)[:60000]})
+    sim_closed = [s for s in c["similar_prior_cases"] if not str(s).startswith("AC-")]
+    sim_agent = [s for s in c["similar_prior_cases"] if str(s).startswith("AC-")]
     edges = {"AC_ON_CARD": ("Card", [case["card_id"]]), "AC_INVOLVES": ("Transaction", c["affected_txn_ids"] or [str(case["flagged_txn_id"])]),
-             "AC_CONNECTED": ("Card", c["connected_card_ids"]), "AC_SIMILAR": ("ClosedCase", c["similar_prior_cases"])}
+             "AC_CONNECTED": ("Card", c["connected_card_ids"]), "AC_SIMILAR": ("ClosedCase", sim_closed), "AC_SIMILAR_AGENT": ("AgentCase", sim_agent)}
     for et, (tt, targets) in edges.items():
         for t in targets:
             try: conn.upsertEdge("AgentCase", cid, et, tt, str(t))

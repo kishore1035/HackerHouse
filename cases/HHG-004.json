@@ -41,25 +41,25 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 3 confirmed fraud (card_not_present_new_device, none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 3 confirmed fraud (card_not_present_new_device, none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
           "CC-1284",
-          "CC-1803",
+          "CC-1287",
           "CC-4821",
           "CC-2417",
-          "CC-1287"
+          "CC-1803"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 4: Out-of-region use; R5 Card testing.",
+        "claim": "Policy and typology passages grounding the decision: Pattern 1: Card testing; R5 Card testing.; Pattern 2: Card-not-present fraud",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "pattern:001",
-          "pattern:003",
-          "policy:009"
+          "pattern:000",
+          "policy:009",
+          "pattern:001"
         ]
       },
       {
@@ -77,12 +77,12 @@
     ],
     "similar_prior_cases": [
       "CC-1284",
-      "CC-1803",
+      "CC-1287",
       "CC-4821",
       "CC-2417",
-      "CC-1287"
+      "CC-1803"
     ],
-    "summary": "Case HHG-004 was initiated following a report from customer C08106 disputing an online transaction of $128.33 on card C08106-K1. The transaction (ID 3583227) occurred on 2016-12-29 01:53:54 and was executed via a newly identified device profile D001320 (Firefox 47.0). The charge significantly exceeds the customer's historical baseline of 209 transactions averaging $35.31 (z=3.3). Based on the customer dispute, device anomaly, and a calibrated fraud probability of 0.93 under the card-not-present pattern, the verdict is confirmed fraud. The card was blocked and the case created, with no SAR filed as exposure remained under $1,000.",
+    "summary": "Case HHG-004 was initiated following an alert and customer dispute from customer C08106 regarding an unauthorized $128.33 online transaction (txn 3583227) on card C08106-K1 on 2016-12-29. The transaction for product C deviated significantly from the historical baseline of 209 prior transactions averaging $35.31 (z=3.3) and originated from a newly identified device (firefox 47.0, D001320). A supervised fraud model calculated a calibrated fraud probability of 0.93, consistent with card-not-present fraud patterns. Based on the customer confirmation, behavioral anomaly, and model scoring, the incident is confirmed as fraud with an exposure of $128.33.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-004"
   },
@@ -123,7 +123,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.93 with 2 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 3161,
-  "latency_s": 10.2
+  "tool_calls": 9,
+  "tokens": 2838,
+  "latency_s": 11.0
 }

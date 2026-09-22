@@ -39,6 +39,7 @@ Secrets live in `.env` (git-ignored): `OMNIROUTE_BASE_URL`, `OMNIROUTE_API_KEY`,
 - The closed cases have a distribution quirk: cleared cases sit on light cards with widely shared devices. Models can pick that up, so probabilities are shrunk and the agent runs a verification loop when signals are few.
 - Fraud episode reconstruction is weakest for account takeover on very heavy cards.
 - TigerGraph MCP is not wired in yet; the agent calls the same installed GSQL queries directly through pyTigerGraph.
+- Case memory now retrieves the agent's own prior investigations (`similar_agent_cases`, `gsql/vector_queries.gsql`) alongside closed-case history, merged by vector distance in `Investigator._graphrag`. Re-run `gsql/schema.gsql` and `gsql/vector_queries.gsql` to pick up the `AC_SIMILAR_AGENT` edge and new query before the next `run_cases.py`.
 
 ## Still to do for submission
 

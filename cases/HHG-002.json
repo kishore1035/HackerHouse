@@ -23,24 +23,24 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-2695",
           "CC-2937",
-          "CC-4783",
-          "CC-3639",
-          "CC-2096"
+          "CC-2096",
+          "CC-4734",
+          "CC-2695",
+          "CC-3639"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 1: Card testing; R5 Card testing.",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R4 No reply within 24 hours.; R5 Card testing.",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
           "pattern:001",
-          "pattern:000",
+          "policy:008",
           "policy:009"
         ]
       },
@@ -58,13 +58,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-2695",
       "CC-2937",
-      "CC-4783",
-      "CC-3639",
-      "CC-2096"
+      "CC-2096",
+      "CC-4734",
+      "CC-2695",
+      "CC-3639"
     ],
-    "summary": "On 2016-11-22 at 17:27:07, transaction 3478782 for $292.36 (online channel, product C) on card C11891-K1 belonging to customer C11891 was flagged with a real-time risk score of 0.79. The transaction represents a significant deviation from the card baseline of 35 prior transactions averaging $44.66 (z=9.7), with a calibrated fraud probability of 0.92. Following an initial verification request, customer C11891 confirmed they still held the card and did not make the purchase, establishing a card-not-present fraud pattern. The total exposure is $292.36, leading to a card block and case creation.",
+    "summary": "Case HHG-002 was opened after real-time monitoring flagged online transaction 3478782 for $292.36 on 2016-11-22 17:27:07 for card C11891-K1 (customer C11891), which deviated significantly from the card's 35-transaction baseline average of $44.66 (z=9.7). A supervised model estimated a calibrated fraud probability of 0.92 matching a card-not-present fraud pattern. When contacted, customer C11891 confirmed they still held the card and did not authorize the transaction. The final verdict is fraud, resulting in the card being blocked and the case recorded without a SAR filing as exposure is below $1,000.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-002"
   },
@@ -100,7 +100,7 @@
         "reason": "R2: customer dispute opens a case"
       }
     ],
-    "what_changed": "Initial actions included verifying with the customer and creating a case; following customer confirmation that the $292.36 transaction was unauthorized while still in possession of the card, final action was updated to block card C11891-K1."
+    "what_changed": "Initial actions were updated from VERIFY_WITH_CUSTOMER and CREATE_CASE to BLOCK_CARD and CREATE_CASE after customer C11891 confirmed the $292.36 transaction was unauthorized while remaining in possession of the card."
   },
   "sar": {
     "file": false,
@@ -111,7 +111,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.92 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 6,
-  "tokens": 2652,
-  "latency_s": 12.0
+  "tool_calls": 7,
+  "tokens": 2662,
+  "latency_s": 12.1
 }

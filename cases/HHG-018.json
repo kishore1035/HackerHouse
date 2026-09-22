@@ -37,25 +37,25 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-3639",
           "CC-3931",
-          "CC-3761",
+          "CC-3639",
           "CC-3640",
-          "CC-0893"
+          "CC-0893",
+          "CC-3761"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 1: Card testing; R7 Disputed but legitimate.",
+        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 1: Card testing; Pattern 5: Account takeover",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
           "policy:009",
           "pattern:000",
-          "policy:011"
+          "pattern:004"
         ]
       },
       {
@@ -72,13 +72,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-3639",
       "CC-3931",
-      "CC-3761",
+      "CC-3639",
       "CC-3640",
-      "CC-0893"
+      "CC-0893",
+      "CC-3761"
     ],
-    "summary": "Case HHG-018 was triggered by customer C02354 disputing an in-person transaction (ID 3491361) of $39.08 on card C02354-K2, dated 2016-11-27 13:41:26 in region 126. A review of transaction history revealed that the exact $39.08 amount occurred 11 prior times under the same product code W, establishing a recurring pattern. Upon customer outreach, the customer reviewed the recurring history and confirmed the transaction was their own legitimate subscription. Consequently, the case was resolved as legitimate with a calibrated fraud probability of 0.05.",
+    "summary": "Case HHG-018 was initiated following an inquiry from customer C02354 regarding an in-person transaction 3491361 of $39.08 for product W on card C02354-K2 on 2016-11-27 13:41:26 in region 126. An investigation revealed that the exact $39.08 amount had appeared 11 prior times on the card under the same product code as a recurring pattern, and billing region 126 accounted for 9.6% of previous activity. Upon verification, the customer recognized the charge as their own subscription after reviewing the recurring merchant and amount history. With a calibrated fraud probability of 0.05 and no confirmed fraud among similar historical cases, the case was determined legitimate and closed with the transaction allowed.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-018"
   },
@@ -119,7 +119,7 @@
         "reason": "R3: let the transaction stand"
       }
     ],
-    "what_changed": "Initial actions focused on customer verification and warning, but final actions shifted to allowing the transaction and closing the case as no fraud once the customer recognized and confirmed the recurring subscription charge."
+    "what_changed": "Initial actions to create a case, verify with the customer, and warn the customer were updated to closing the case as no fraud and allowing the transaction because the customer confirmed the charge as their own subscription."
   },
   "sar": {
     "file": false,
@@ -130,7 +130,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.05 with 1 independent signal(s) and a customer confirms reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 6,
-  "tokens": 2635,
-  "latency_s": 11.7
+  "tool_calls": 7,
+  "tokens": 2842,
+  "latency_s": 12.4
 }

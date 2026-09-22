@@ -57,25 +57,25 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 5 confirmed fraud (card_not_present_new_device)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 5 confirmed fraud (card_not_present_new_device)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-2063",
           "CC-2059",
-          "CC-4163",
           "CC-1219",
+          "CC-4163",
+          "CC-2063",
           "CC-3204"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 1: Card testing; R5 Card testing.",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 1: Card testing; Pattern 4: Out-of-region use",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
           "pattern:001",
           "pattern:000",
-          "policy:009"
+          "pattern:003"
         ]
       },
       {
@@ -92,13 +92,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-2063",
       "CC-2059",
-      "CC-4163",
       "CC-1219",
+      "CC-4163",
+      "CC-2063",
       "CC-3204"
     ],
-    "summary": "Case HHG-011 was opened after customer C11923 reported an unauthorized $131.30 online transaction on card C11923-K2. Investigation identified an episode of 4 online transactions totaling $149.83 between 2016-12-27 05:19:26 and 2016-12-29 15:42:09 via a new device profile. The activity exhibits card-not-present fraud and card testing patterns, with a calibrated model fraud probability of 0.98. Actions were taken to block the card and maintain the case file, with no SAR filing required due to exposure remaining under $1,000.",
+    "summary": "Customer C11923 reported an unauthorized $131.30 transaction (3583368) on card C11923-K2. An investigation identified a 4-transaction episode totaling $149.83 executed between 2016-12-27 05:19:26 and 2016-12-29 15:42:09. The activity originated from a newly observed device (D009680) matching card-not-present fraud patterns, yielding a calibrated fraud probability of 0.98. The case was finalized as confirmed fraud with the card blocked, and no SAR was required due to exposure remaining below $1,000.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-011"
   },
@@ -139,7 +139,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.98 with 3 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 3046,
-  "latency_s": 10.4
+  "tool_calls": 9,
+  "tokens": 3881,
+  "latency_s": 14.4
 }

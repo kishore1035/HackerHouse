@@ -43,25 +43,25 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 5 confirmed fraud (card_not_present_new_device)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 5 confirmed fraud (card_not_present_new_device)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-3350",
-          "CC-2065",
           "CC-2073",
           "CC-2279",
-          "CC-4911"
+          "CC-2065",
+          "CC-4911",
+          "CC-3350"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 3: Card-not-present fraud from a new device; R5 Card testing.; Pattern 2: Card-not-present fraud",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 3: Card-not-present fraud from a new device",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "pattern:002",
+          "pattern:001",
           "policy:009",
-          "pattern:001"
+          "pattern:002"
         ]
       },
       {
@@ -78,13 +78,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-3350",
-      "CC-2065",
       "CC-2073",
       "CC-2279",
-      "CC-4911"
+      "CC-2065",
+      "CC-4911",
+      "CC-3350"
     ],
-    "summary": "On 2016-11-22 16:11:00, online transaction 3478561 for $74.96 (product C, region 191) was flagged on card C13487-K1 for customer C13487. The transaction was initiated via an anonymous proxy from device profile D009705, which is recorded as a new device for this account. Customer verification was initiated, but no response was received within 24 hours. Given a calibrated fraud probability of 0.48 and an uncertain verdict, the transaction was declined, the card placed on monitoring, and the case escalated to an analyst.",
+    "summary": "On 2016-11-22 16:11:00, online transaction 3478561 for $74.96 on card C13487-K1 belonging to customer C13487 was reviewed following an analyst trigger regarding a shared device profile. The transaction originated from an anonymous proxy and a device profile (D009705) marked as new for the account, yielding a calibrated fraud probability of 0.48. Outreach was initiated, but no customer response was received within 24 hours. Consequently, the transaction was declined, the card placed on monitoring, and the case escalated to an analyst under an uncertain verdict.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-014"
   },
@@ -135,7 +135,7 @@
         "reason": "R4/R8: no reply and exposure above $500, or conflicting evidence"
       }
     ],
-    "what_changed": "Initial actions were updated to replace customer verification with declining the transaction and monitoring the card because no reply was received from the customer within 24 hours."
+    "what_changed": "Final actions added DECLINE_TRANSACTION and MONITOR_CARD while dropping VERIFY_WITH_CUSTOMER after no customer response was received within 24 hours. These measures mitigate potential loss on the unverified transaction while maintaining ongoing surveillance on card C13487-K1."
   },
   "sar": {
     "file": false,
@@ -146,7 +146,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.48 with 2 independent signal(s) and a customer no_reply reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 2828,
-  "latency_s": 8.8
+  "tool_calls": 9,
+  "tokens": 3023,
+  "latency_s": 10.1
 }

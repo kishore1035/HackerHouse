@@ -41,25 +41,25 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-1445",
-          "CC-0099",
           "CC-1396",
           "CC-0991",
+          "CC-0099",
+          "CC-1445",
           "CC-0986"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 2: Card-not-present fraud; Pattern 3: Card-not-present fraud from a new device",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 3: Card-not-present fraud from a new device; Pattern 4: Out-of-region use",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "policy:009",
           "pattern:001",
-          "pattern:002"
+          "pattern:002",
+          "pattern:003"
         ]
       },
       {
@@ -76,13 +76,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-1445",
-      "CC-0099",
       "CC-1396",
       "CC-0991",
+      "CC-0099",
+      "CC-1445",
       "CC-0986"
     ],
-    "summary": "Case HHG-019 was opened after online transaction 3503878 for $99.92 on card C07987-K2 (customer C07987) on 2016-12-01 17:28:53 triggered a real-time risk score of 0.90. The activity involved a newly identified device profile D008315, resulting in a calibrated fraud probability of 0.94 consistent with card-not-present fraud from a new device. Customer outreach confirmed the transaction was unauthorized while the customer retained physical possession of the card. Consequently, the card was blocked and the case was documented with an exposure of $99.92.",
+    "summary": "Case HHG-019 was initiated after real-time monitoring flagged online transaction 3503878 for $99.92 on card C07987-K2 (customer C07987) on 2016-12-01 17:28:53. The transaction originated in region 264 from a new device profile D008315, generating a calibrated fraud probability of 0.94. Customer verification confirmed that the customer did not make the purchase and still possesses the card. Based on the confirmed unauthorized activity, the case is concluded as card-not-present fraud from a new device with a total exposure of $99.92.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-019"
   },
@@ -123,7 +123,7 @@
         "reason": "R2: customer dispute opens a case"
       }
     ],
-    "what_changed": "Initial actions called for step-up authentication and customer verification, but upon customer confirmation of unauthorized activity, actions were updated to block the card and finalize the case."
+    "what_changed": "Initial actions of step-up authentication and customer verification were transitioned to blocking card C07987-K2 and maintaining case creation once the customer confirmed the transaction was unauthorized."
   },
   "sar": {
     "file": false,
@@ -134,7 +134,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.94 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 2800,
-  "latency_s": 9.9
+  "tool_calls": 9,
+  "tokens": 2701,
+  "latency_s": 9.5
 }

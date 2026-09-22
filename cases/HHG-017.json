@@ -50,24 +50,24 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 2 confirmed fraud (card_not_present_new_device, none, undocumented)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 3 confirmed fraud (card_not_present_new_device, none, undocumented)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
           "CC-3841",
-          "CC-2096",
           "CC-1092",
-          "CC-4818",
-          "CC-4734"
+          "AC-HHG-010",
+          "CC-3907",
+          "CC-2096"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 1: Card testing; Pattern 4: Out-of-region use",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 4: Out-of-region use",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
           "pattern:001",
-          "pattern:000",
+          "policy:009",
           "pattern:003"
         ]
       },
@@ -86,12 +86,12 @@
     ],
     "similar_prior_cases": [
       "CC-3841",
-      "CC-2096",
       "CC-1092",
-      "CC-4818",
-      "CC-4734"
+      "AC-HHG-010",
+      "CC-3907",
+      "CC-2096"
     ],
-    "summary": "Case HHG-017 was opened for customer C04570 regarding card C04570-K1 following a real-time model alert on online transaction 3450629 ($100.09). An episode of 3 online transactions totaling $300.14 for product R in region 204 occurred between 2016-11-11 22:36:50 and 2016-11-11 23:46:24. The calibrated supervised model estimated a fraud probability of 0.92 under the card-not-present fraud pattern. Customer outreach confirmed the customer still possessed the physical card but did not authorize any of the transactions. Consequently, card C04570-K1 was blocked and a fraud case was created with an exposure of $300.14.",
+    "summary": "Investigation of case HHG-017 confirmed card-not-present fraud on card C04570-K1 belonging to customer C04570, resulting in a total exposure of $300.14. The activity comprises an episode of three online transactions for product R in region 204 occurring between 2016-11-11 22:36:50 and 2016-11-11 23:46:24. When contacted, the customer stated they did not make the purchases and still retain physical possession of the card. In response, card C04570-K1 was blocked, and the case was documented with no SAR required due to exposure remaining below $1,000.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-017"
   },
@@ -112,7 +112,7 @@
       {
         "action": "VERIFY_WITH_CUSTOMER",
         "route": "auto",
-        "reason": "R1: probability 0.77 with 1 independent signal(s); verify before any block"
+        "reason": "R1: probability 0.78 with 1 independent signal(s); verify before any block"
       },
       {
         "action": "CREATE_CASE",
@@ -132,7 +132,7 @@
         "reason": "R2: customer dispute opens a case"
       }
     ],
-    "what_changed": "Initial actions required customer verification and step-up authentication, but upon the customer confirming the transactions were unauthorized while retaining the card, the card was immediately blocked. With verification complete, the final actions were updated to BLOCK_CARD and CREATE_CASE."
+    "what_changed": "Initial actions focused on customer verification and stepped-up authentication following the real-time scoring alert. After customer C04570 confirmed the transactions were unauthorized, the actions were updated to block card C04570-K1 and maintain the case."
   },
   "sar": {
     "file": false,
@@ -143,7 +143,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.92 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 3983,
-  "latency_s": 15.4
+  "tool_calls": 9,
+  "tokens": 3562,
+  "latency_s": 12.8
 }

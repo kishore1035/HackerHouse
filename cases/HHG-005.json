@@ -42,25 +42,25 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
           "CC-3105",
-          "CC-0641",
           "CC-1024",
-          "CC-1287",
-          "CC-1006"
+          "CC-1006",
+          "CC-0641",
+          "CC-1287"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 1: Card testing; Pattern 3: Card-not-present fraud from a new device",
+        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 1: Card testing; Pattern 2: Card-not-present fraud",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "pattern:001",
+          "policy:009",
           "pattern:000",
-          "pattern:002"
+          "pattern:001"
         ]
       },
       {
@@ -78,12 +78,12 @@
     ],
     "similar_prior_cases": [
       "CC-3105",
-      "CC-0641",
       "CC-1024",
-      "CC-1287",
-      "CC-1006"
+      "CC-1006",
+      "CC-0641",
+      "CC-1287"
     ],
-    "summary": "Case HHG-005 was triggered by online transaction 3523199 for $100.07 on card C02923-K1 (customer C02923) on 2016-12-07 21:38:37 in region 330. The activity matched a card-not-present new device pattern via device profile D000289 (iOS Device | iOS 9.3.5 | mobile safari 9.0 | 1024x768), with a model-estimated fraud probability of 0.45. Outreach was attempted, but no response was received from the customer within 24 hours. Given the uncertain verdict and unresolved customer verification, transaction 3523199 is declined and card C02923-K1 is placed on monitoring.",
+    "summary": "On 2016-12-07 21:38:37, transaction 3523199 for $100.07 (product R, region 330) on card C02923-K1 for customer C02923 was flagged for card-not-present risk on new device D000289. The supervised model estimated a calibrated fraud probability of 0.45 against a 90-transaction card baseline averaging $177.52. After customer C02923 failed to reply within 24 hours, the case verdict was set to uncertain with $100.07 in exposure. The bank proceeded to decline the transaction, monitor the card, and maintain the case.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-005"
   },
@@ -124,7 +124,7 @@
         "reason": "Evidence requested and unanswered"
       }
     ],
-    "what_changed": "Initial actions called for customer verification and case creation, but because no reply was received from the customer within 24 hours, the final actions were updated to decline transaction 3523199 and monitor card C02923-K1."
+    "what_changed": "Initial actions to verify with the customer were escalated to declining transaction 3523199 and monitoring card C02923-K1 because no reply was received from customer C02923 within 24 hours."
   },
   "sar": {
     "file": false,
@@ -135,7 +135,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.45 with 1 independent signal(s) and a customer no_reply reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 3015,
-  "latency_s": 10.8
+  "tool_calls": 9,
+  "tokens": 3298,
+  "latency_s": 10.6
 }

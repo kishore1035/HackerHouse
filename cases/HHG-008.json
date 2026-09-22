@@ -43,25 +43,25 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 5 confirmed fraud (card_not_present_fraud, card_not_present_new_device, undocumented)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 5 confirmed fraud (card_not_present_new_device, undocumented)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-3960",
-          "CC-3841",
-          "CC-2681",
+          "CC-3907",
+          "CC-4124",
+          "CC-4086",
           "CC-5520",
-          "CC-4124"
+          "AC-HHG-004"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 4: Out-of-region use",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 1: Card testing; R5 Card testing.",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
           "pattern:001",
-          "policy:009",
-          "pattern:003"
+          "pattern:000",
+          "policy:009"
         ]
       },
       {
@@ -78,13 +78,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-3960",
-      "CC-3841",
-      "CC-2681",
+      "CC-3907",
+      "CC-4124",
+      "CC-4086",
       "CC-5520",
-      "CC-4124"
+      "AC-HHG-004"
     ],
-    "summary": "Customer C13171 alerted the bank after identifying an unauthorized online charge of $55.68 (transaction 3558054) on card C13171-K2. Subsequent analysis revealed an episode of three rapid online transactions for product C occurring between 2016-12-19 21:48:32 and 2016-12-19 22:08:56, resulting in a total exposure of $166.97. The supervised graph model evaluated the activity with a calibrated fraud probability of 0.98, consistent with five similar historical card-not-present fraud cases. Card blocking and case creation were executed to halt further unauthorized transactions.",
+    "summary": "Customer C13171 reported an unauthorized online transaction of $55.68 (transaction 3558054) on card C13171-K2. Further analysis identified an episode of three rapid online transactions for product C between 2016-12-19 21:48:32 and 2016-12-19 22:08:56, totaling $166.97. The calibrated supervised model evaluated the fraud probability at 0.98 under a card-not-present fraud pattern. The card was blocked and a case was created, with no SAR required due to the total exposure remaining below $1,000.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-008"
   },
@@ -125,7 +125,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.98 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 2950,
-  "latency_s": 10.4
+  "tool_calls": 9,
+  "tokens": 3361,
+  "latency_s": 11.6
 }

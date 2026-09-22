@@ -23,15 +23,15 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-4027",
-          "CC-3639",
           "CC-0034",
-          "CC-4783",
-          "CC-3050"
+          "CC-3050",
+          "CC-3639",
+          "CC-4027",
+          "CC-4783"
         ]
       },
       {
@@ -58,13 +58,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-4027",
-      "CC-3639",
       "CC-0034",
-      "CC-4783",
-      "CC-3050"
+      "CC-3050",
+      "CC-3639",
+      "CC-4027",
+      "CC-4783"
     ],
-    "summary": "Case HHG-009 was initiated following a report from customer C08299 stating that an online transaction of $30.02 on card C08299-K1 was unauthorized. Transaction 3581141 occurred on 2016-12-28 12:10:53 in region 203 for product S. A supervised model evaluated the activity with a calibrated fraud probability of 0.96 under the card-not-present fraud typology. The card was blocked and a case was created, with total exposure limited to $30.02.",
+    "summary": "On 2016-12-28 12:10:53, an online transaction (ID 3581141) of $30.02 for product S in region 203 was conducted on card C08299-K1 associated with customer C08299. Customer C08299 alerted the bank stating that they never made the $30.02 purchase and requested an account review. The supervised model calculated a calibrated fraud probability of 0.96, aligning with a card-not-present fraud pattern. In response, card C08299-K1 was blocked and a case was created for the total exposure of $30.02.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-009"
   },
@@ -105,7 +105,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.96 with 0 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 6,
-  "tokens": 2383,
-  "latency_s": 8.2
+  "tool_calls": 7,
+  "tokens": 2495,
+  "latency_s": 9.1
 }

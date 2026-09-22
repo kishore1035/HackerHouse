@@ -49,25 +49,25 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (card_not_present_new_device, none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-3105",
-          "CC-3148",
           "CC-0986",
+          "CC-3105",
           "CC-2323",
-          "CC-4488"
+          "CC-3148",
+          "AC-HHG-005"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 3: Card-not-present fraud from a new device",
+        "claim": "Policy and typology passages grounding the decision: Pattern 3: Card-not-present fraud from a new device; R5 Card testing.; Pattern 2: Card-not-present fraud",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "pattern:001",
+          "pattern:002",
           "policy:009",
-          "pattern:002"
+          "pattern:001"
         ]
       },
       {
@@ -78,13 +78,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-3105",
-      "CC-3148",
       "CC-0986",
+      "CC-3105",
       "CC-2323",
-      "CC-4488"
+      "CC-3148",
+      "AC-HHG-005"
     ],
-    "summary": "Case HHG-010 was initiated after real-time monitoring scored online transaction 3506725 at a calibrated fraud probability of 0.90. On 2016-12-02 15:18:27, an online purchase of $1,000.03 for product R in region 469 was attempted using card C10434-K1 belonging to customer C10434. The transaction represented an extreme deviation (z=4.9) from the cardholder's baseline average of $131.25 across 33 prior transactions and originated from an unrecognized new device (D000253). Based on the high model probability and indicators consistent with Pattern 3 card-not-present fraud from a new device, the activity was confirmed as fraud. The bank executed actions to block the card, create a case, and file a regulatory report for the $1,000.03 exposure.",
+    "summary": "Case HHG-010 was opened for customer C10434 after real-time monitoring flagged online transaction 3506725 on card C10434-K1 for $1,000.03 on 2016-12-02 15:18:27. The transaction for product R in region 469 was conducted from a new device profile D000253 and significantly deviated from the historical baseline of 33 transactions averaging $131.25 (z=4.9). The supervised model assigned a calibrated fraud probability of 0.90, matching card-not-present fraud patterns. Based on the confirmed fraud verdict and an exposure exceeding $1,000, final actions were taken to block the card, create a case, and file a regulatory report.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-010"
   },
@@ -129,7 +129,7 @@
   "sar": {
     "file": true,
     "reason": "exposure $1,000.03 exceeds $1,000",
-    "narrative": "This Suspicious Activity Report details suspected card-not-present fraud involving customer C10434 and card C10434-K1. On 2016-12-02 at 15:18:27, an online transaction of $1,000.03 for product code R was initiated in region 469 under transaction ID 3506725. The transaction generated an automated alert with an estimated model fraud probability of 1.00, calibrated to 0.90. Analysis revealed that the transaction amount of $1,000.03 sharply diverged from the account's historical baseline of 33 prior transactions averaging $131.25, reflecting a z-score of 4.9. Identity records confirmed that the transaction was conducted from device profile D000253 (Windows 10, Edge 16.0), which was marked as new for this account. The activity aligns with Pattern 3 typology for card-not-present fraud executed from an unauthorized new device. Because the total financial exposure of $1,000.03 exceeds the reporting threshold of $1,000, filing a report is required. The financial institution has mitigated risk by blocking card C10434-K1, logging case HHG-010, and submitting this regulatory filing.",
+    "narrative": "This Suspicious Activity Report relates to customer C10434 and card C10434-K1 regarding suspected card-not-present fraud. On 2016-12-02 at 15:18:27, an online transaction (ID 3506725) was attempted for $1,000.03 under product code R in region 469. The transaction was conducted using device profile D000253 (Windows | Windows 10 | edge 16.0 | 1366x768), which was recorded as new for this account. The transaction amount of $1,000.03 represents an extreme deviation (z=4.9) from the cardholder's baseline of 33 prior transactions averaging $131.25. The supervised model utilizing over 60 graph-derived features generated a calibrated fraud probability of 0.90. The activity matches typologies for Pattern 3 (Card-not-present fraud from a new device) and Pattern 2 (Card-not-present fraud). Additionally, device profile D000253 has been observed on 209 cards, including 10 confirmed-fraud closed cases. Total financial exposure is $1,000.03, which exceeds the $1,000 filing threshold. The financial institution has taken risk mitigation actions by blocking card C10434-K1, creating case HHG-010, and submitting this report.",
     "subjects": [
       "C10434",
       "C10434-K1"
@@ -141,7 +141,7 @@
     ]
   },
   "stop_reason": "Probability 0.90 with 2 independent signal(s); further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 4636,
-  "latency_s": 15.1
+  "tool_calls": 9,
+  "tokens": 4257,
+  "latency_s": 12.6
 }

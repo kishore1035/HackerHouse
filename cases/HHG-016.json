@@ -49,24 +49,24 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-5462",
+          "CC-0997",
           "CC-0587",
           "CC-1396",
-          "CC-0997",
+          "CC-5462",
           "CC-4590"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 3: Card-not-present fraud from a new device",
+        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 2: Card-not-present fraud; Pattern 3: Card-not-present fraud from a new device",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "pattern:001",
           "policy:009",
+          "pattern:001",
           "pattern:002"
         ]
       },
@@ -84,13 +84,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-5462",
+      "CC-0997",
       "CC-0587",
       "CC-1396",
-      "CC-0997",
+      "CC-5462",
       "CC-4590"
     ],
-    "summary": "Case HHG-016 was opened after customer C09988 disputed an unauthorized online transaction of $59.67 on card C09988-K1 (transaction 3534820 on 2016-12-11 22:39:08). The transaction occurred via a new device profile D000703 (Windows | edge 16.0) against a card baseline of 48 prior transactions averaging $39.80 (z=0.8). The calibrated fraud probability is 0.96 under the card-not-present from a new device pattern. Based on customer notification and high model risk, the case is finalized as fraud with an exposure of $59.67. Actions remain to block the card and maintain the case file, with no SAR required.",
+    "summary": "Customer C09988 reported an unauthorized online transaction of $59.67 (transaction 3534820) on card C09988-K1 dated 2016-12-11 22:39:08. The transaction involved product C and was conducted from a new device profile D000703 (Windows | edge 16.0). The calibrated supervised fraud model estimated a fraud probability of 0.96. The card was blocked and an internal case was created to mitigate risk.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-016"
   },
@@ -131,7 +131,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.96 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 3275,
-  "latency_s": 11.6
+  "tool_calls": 9,
+  "tokens": 2581,
+  "latency_s": 10.8
 }

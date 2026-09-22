@@ -31,24 +31,24 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-2695",
-          "CC-0657",
           "CC-4437",
+          "CC-0657",
           "CC-4708",
-          "CC-2770"
+          "CC-2770",
+          "CC-2283"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 2: Card-not-present fraud; Pattern 4: Out-of-region use",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 4: Out-of-region use",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "policy:009",
           "pattern:001",
+          "policy:009",
           "pattern:003"
         ]
       },
@@ -66,13 +66,13 @@
       }
     ],
     "similar_prior_cases": [
-      "CC-2695",
-      "CC-0657",
       "CC-4437",
+      "CC-0657",
       "CC-4708",
-      "CC-2770"
+      "CC-2770",
+      "CC-2283"
     ],
-    "summary": "Case HHG-001 was initiated for customer C12382 regarding an in-person transaction 3514030 of $77.07 on card C12382-K1 on 2016-12-04 19:55:28. The charge occurred in billing region 444, which comprises only 2.8% of historical activity while home activity continued in parallel. Customer C12382 confirmed they still hold the physical card and did not authorize the purchase. Based on a calibrated fraud probability of 0.92 and out-of-region use, the verdict is fraud and the card was blocked.",
+    "summary": "Case HHG-001 was initiated for customer C12382 regarding card C12382-K1 after transaction 3514030 for $77.07 on 2016-12-04 19:55:28 was flagged for out-of-region use in billing region 444. Region 444 accounts for only 2.8% of the card's historical activity, and home activity continued in parallel. When contacted, the customer stated they did not make the purchase and still hold the card. Based on a calibrated fraud probability of 0.92 and the customer's confirmation, the verdict is confirmed fraud with $77.07 in exposure.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-001"
   },
@@ -113,7 +113,7 @@
         "reason": "R2: customer dispute opens a case"
       }
     ],
-    "what_changed": "Initial actions included customer verification and analyst escalation, which concluded with blocking card C12382-K1 and creating the case after customer confirmation that the transaction was unauthorized."
+    "what_changed": "Initial actions included customer verification and escalation, which were transitioned to blocking card C12382-K1 and finalizing case creation once the customer confirmed the transaction was unauthorized."
   },
   "sar": {
     "file": false,
@@ -124,7 +124,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.92 with 0 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 6,
-  "tokens": 2698,
-  "latency_s": 15.8
+  "tool_calls": 7,
+  "tokens": 2890,
+  "latency_s": 22.6
 }

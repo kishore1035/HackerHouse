@@ -41,24 +41,24 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
         "source": "graph",
-        "ref": "query:similar_cases(vector k=5)",
+        "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
           "CC-5462",
+          "CC-0997",
           "CC-4259",
-          "CC-1131",
           "CC-1396",
-          "CC-0997"
+          "CC-1131"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 3: Card-not-present fraud from a new device",
+        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 1: Card testing; Pattern 3: Card-not-present fraud from a new device",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "pattern:001",
           "policy:009",
+          "pattern:000",
           "pattern:002"
         ]
       },
@@ -71,12 +71,12 @@
     ],
     "similar_prior_cases": [
       "CC-5462",
+      "CC-0997",
       "CC-4259",
-      "CC-1131",
       "CC-1396",
-      "CC-0997"
+      "CC-1131"
     ],
-    "summary": "On 2016-11-17 14:03:36, online transaction 3464869 for $599.94 (product R) was initiated in region 327 on card C03042-K1 associated with customer C03042. The transaction significantly deviated from the baseline of 68 prior transactions averaging $132.61 (z=3.5) and was conducted via a newly recognized device profile (D001385). Supervised modeling estimated a calibrated fraud probability of 0.92, matching card-not-present fraud typologies. Preventive actions were taken to block card C03042-K1 and create a case, with no SAR required due to exposure remaining under $1,000.",
+    "summary": "Case HHG-015 was initiated for customer C03042 after real-time monitoring scored online transaction 3464869 on card C03042-K1 at 0.77 on 2016-11-17 14:03:36. The $599.94 transaction for product R in region 327 significantly exceeded the customer baseline of 68 prior transactions averaging $132.61 (z=3.5). The transaction was initiated from a new device profile (D001385) for this account, resulting in a calibrated fraud probability of 0.92. Consistent with policy, the card was blocked and a case created, with no SAR required as total exposure is under $1,000.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-015"
   },
@@ -117,7 +117,7 @@
     "activity_dates": []
   },
   "stop_reason": "Probability 0.92 with 2 independent signal(s); further steps would not change the recommended actions (policy section 6).",
-  "tool_calls": 8,
-  "tokens": 2915,
-  "latency_s": 9.8
+  "tool_calls": 9,
+  "tokens": 2884,
+  "latency_s": 11.7
 }
