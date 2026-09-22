@@ -19,6 +19,103 @@ An agentic fraud investigator for the TigerGraph x Hacker House Goa challenge. I
 - **Models** (`scripts/train_models.py`, `scripts/train_episode.py`): gradient boosting over graph-derived features, trained on the closed cases. The bank risk score is deliberately excluded from the fraud model. Grouped 5-fold CV: fraud AUC 0.987, pattern accuracy 0.83, episode F1 0.80. The same feature code runs against an in-memory client (training) and the TigerGraph client (production); outputs were checked identical.
 - **UI** (`ui/index.html`, `api/app.py`): analyst dashboard with the alert queue, live streamed investigation timeline, uncertainty gauge, initial vs final actions, evidence with sources, SAR, graph view and case memory.
 
+### Pipeline
+
+```mermaid
+flowchart LR
+  A[Trigger\nrisk score / customer report / analyst] --> B[1. Investigate\nGSQL: card_txns, device_txns,\ndevice_closed_cases, card_closed_cases, ring_expand]
+  B --> C[2. Gather\nepisode model + rule detectors]
+  C --> D[3. GraphRAG\nsimilar_cases + similar_agent_cases + policy_search]
+  D --> E[4. Assess\ncalibrated fraud probability, pattern, signal count]
+  E --> F[5. Recommend\npolicy engine: rules R1-R10, approval routes]
+  F --> G[6. Evidence\nsimulated reply, recommendation updated]
+  G --> H[7. Explain\nLLM writes summary / SAR from structured facts]
+  H --> I[8. Remember\nAgentCase vertex + edges + embedding written to graph]
+  I -.feeds next case's step 3.-> D
+```
+
+### Core investigation flow
+
+```mermaid
+flowchart TD
+  T[Trigger] --> INV[Investigate\ncreate/open case, examine entities,\ntransactions, relationships, behavior, prior cases]
+  INV --> EV[Gather evidence\ncollect evidence, update case as new info is found]
+  EV --> UNC{Assess uncertainty\nrisk, confidence,\nenough evidence to act?}
+  UNC -- no --> MORE[Gather more evidence\nrequest/obtain additional information]
+  MORE --> UNC
+  UNC -- yes --> ACT[Take next actions\nrecommend/execute, progress the case]
+  ACT --> EXP[Explain the decision\nevidence considered, uncertainty, why]
+  EXP --> MEM[Update case memory\nrecord investigation, actions, decisions, outcomes]
+```
+
+### Graph schema
+
+```mermaid
+erDiagram
+  Customer ||--o{ Card : OWNS
+  Card ||--o{ Transaction : MADE
+  Transaction ||--o{ DeviceProfile : FROM_DEVICE
+  Transaction ||--o{ EmailDomain : PURCHASER_EMAIL
+  Transaction ||--o{ BillingRegion : BILLED_IN
+  Transaction ||--o{ Transaction : NEXT
+  ClosedCase ||--o{ Transaction : INVOLVES
+  ClosedCase ||--o{ Card : ON_CARD
+  ClosedCase ||--o{ Card : CONNECTED_TO
+  AgentCase ||--o{ Transaction : AC_INVOLVES
+  AgentCase ||--o{ Card : AC_ON_CARD
+  AgentCase ||--o{ Card : AC_CONNECTED
+  AgentCase ||--o{ DeviceProfile : AC_DEVICE
+  AgentCase ||--o{ ClosedCase : AC_SIMILAR
+  AgentCase ||--o{ AgentCase : AC_SIMILAR_AGENT
+  PolicyChunk {
+    string source
+    string section
+    string text
+    vector emb
+  }
+```
+
+`ClosedCase.emb`, `PolicyChunk.emb`, `AgentCase.emb` are 1024-d cosine vector attributes (`gsql/vectors.gsql`), searched by `similar_cases`, `policy_search`, and `similar_agent_cases` (`gsql/vector_queries.gsql`).
+
+### UI wireframe (`ui/index.html`)
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│ header: FraudGraph Agent                                                │
+├───────────────┬─────────────────────────────────────────────────────────┤
+│ aside          │ main                                                    │
+│                │                                                         │
+│ Alert Queue    │  (no case selected)                                    │
+│  - filters:    │  "Select an Alert to Investigate"                      │
+│    all/fraud/  │                                                         │
+│    legit/      │  (case selected)                                       │
+│    uncertain   │  ┌───────────────────────────────────────────────────┐ │
+│  - alert rows  │  │ Investigation Timeline           [live: N steps]  │ │
+│    (risk,      │  ├───────────────────────────────────────────────────┤ │
+│    customer,   │  │ Uncertainty & Calibrated Verdict                  │ │
+│    analyst)    │  │   stop rule: p >= 0.85 or <= 0.15   [gauge]       │ │
+│                │  ├───────────────────────────────────────────────────┤ │
+│                │  │ Next Best Action        [Policy Rules R1-R10]     │ │
+│                │  │   initial actions  |  final actions  | changed   │ │
+│                │  ├───────────────────────────────────────────────────┤ │
+│                │  │ Agent Reasoning Trace                             │ │
+│                │  ├───────────────────────────────────────────────────┤ │
+│                │  │ Suspicious Activity Report (FinCEN SAR)           │ │
+│                │  │   [FILE_REPORT · Requires L2 Approval] or [n/a]   │ │
+│                │  ├───────────────────────────────────────────────────┤ │
+│                │  │ Live Streamed Trace                [Streaming...] │ │
+│                │  ├───────────────────────────────────────────────────┤ │
+│                │  │ Subgraph Topology                  [graph_case_id]│ │
+│                │  ├───────────────────────────────────────────────────┤ │
+│                │  │ Grounding Evidence                  [N facts]     │ │
+│                │  ├───────────────────────────────────────────────────┤ │
+│                │  │ Case Memory (TigerGraph Vector Retrieval)         │ │
+│                │  └───────────────────────────────────────────────────┘ │
+└───────────────┴─────────────────────────────────────────────────────────┘
+```
+
+Backed by `api/app.py`: `GET /api/cases` (queue), `GET /api/cases/{id}` (detail), `GET /api/stats`, `POST /api/investigate/{id}` (re-run live).
+
 ## Run
 
     docker run -d --name tg -p 14240:14240 -p 9000:9000 --ulimit nofile=1000000:1000000 tigergraph/community:latest
