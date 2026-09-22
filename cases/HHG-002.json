@@ -1,0 +1,117 @@
+{
+  "case_id": "HHG-002",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.92,
+    "pattern": "card_not_present_fraud",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3478782"
+    ],
+    "first_suspicious_txn_id": "3478782",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 292.36,
+    "evidence": [
+      {
+        "claim": "Flagged online transaction of $292.36 (product C) against a card baseline of 35 prior transactions averaging $44.66 (z=9.7)",
+        "source": "graph",
+        "ref": "query:card_txns(cardv=C11891-K1)",
+        "entity_ids": [
+          "3478782"
+        ]
+      },
+      {
+        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "source": "graph",
+        "ref": "query:similar_cases(vector k=5)",
+        "entity_ids": [
+          "CC-2695",
+          "CC-2937",
+          "CC-4783",
+          "CC-3639",
+          "CC-2096"
+        ]
+      },
+      {
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 1: Card testing; R5 Card testing.",
+        "source": "document",
+        "ref": "query:policy_search(vector k=4)",
+        "entity_ids": [
+          "pattern:001",
+          "pattern:000",
+          "policy:009"
+        ]
+      },
+      {
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 0.89; calibrated to 0.92. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "source": "graph",
+        "ref": "model:fraud_gbm_v1",
+        "entity_ids": []
+      },
+      {
+        "claim": "Customer reply (simulated): Customer states they did not make the purchase(s) and still holds the card",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-2695",
+      "CC-2937",
+      "CC-4783",
+      "CC-3639",
+      "CC-2096"
+    ],
+    "summary": "On 2016-11-22 at 17:27:07, transaction 3478782 for $292.36 (online channel, product C) on card C11891-K1 belonging to customer C11891 was flagged with a real-time risk score of 0.79. The transaction represents a significant deviation from the card baseline of 35 prior transactions averaging $44.66 (z=9.7), with a calibrated fraud probability of 0.92. Following an initial verification request, customer C11891 confirmed they still held the card and did not make the purchase, establishing a card-not-present fraud pattern. The total exposure is $292.36, leading to a card block and case creation.",
+    "written_to_graph": true,
+    "graph_case_id": "AC-HHG-002"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 6,
+      "assumed_response": "Customer states they did not make the purchase(s) and still holds the card"
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: probability 0.69 with 1 independent signal(s); verify before any block"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Probability >= 0.30 and evidence is requested (3a)"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denies the transaction"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer dispute opens a case"
+      }
+    ],
+    "what_changed": "Initial actions included verifying with the customer and creating a case; following customer confirmation that the $292.36 transaction was unauthorized while still in possession of the card, final action was updated to block card C11891-K1."
+  },
+  "sar": {
+    "file": false,
+    "reason": "fraud strongly suspected but exposure $292.36 is under $1,000 with no shared origin or coordination: case only",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "Probability 0.92 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
+  "tool_calls": 6,
+  "tokens": 2652,
+  "latency_s": 12.0
+}

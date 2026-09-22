@@ -1,0 +1,129 @@
+{
+  "case_id": "HHG-003",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.95,
+    "pattern": "out_of_region_use",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3527215",
+      "3530164"
+    ],
+    "first_suspicious_txn_id": "3527215",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 108.0,
+    "evidence": [
+      {
+        "claim": "Flagged in person transaction of $49.00 (product W) against a card baseline of 980 prior transactions averaging $128.84 (z=-0.5)",
+        "source": "graph",
+        "ref": "query:card_txns(cardv=C08623-K2)",
+        "entity_ids": [
+          "3530164"
+        ]
+      },
+      {
+        "claim": "2 transactions on this card between 2016-12-09 12:36:58 and 2016-12-10 13:01:21 form one episode (episode model over graph features), total $108.00",
+        "source": "graph",
+        "ref": "model:episode_membership_v1",
+        "entity_ids": [
+          "3527215",
+          "3530164"
+        ]
+      },
+      {
+        "claim": "Card-present use in billing region 330, which is 4.3% of the card's prior activity; home activity continues in parallel",
+        "source": "graph",
+        "ref": "query:card_txns(region)",
+        "entity_ids": [
+          "3530164"
+        ]
+      },
+      {
+        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "source": "graph",
+        "ref": "query:similar_cases(vector k=5)",
+        "entity_ids": [
+          "CC-4734",
+          "CC-4591",
+          "CC-3931",
+          "CC-2937",
+          "CC-4538"
+        ]
+      },
+      {
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 4: Out-of-region use; R5 Card testing.",
+        "source": "document",
+        "ref": "query:policy_search(vector k=4)",
+        "entity_ids": [
+          "pattern:001",
+          "pattern:003",
+          "policy:009"
+        ]
+      },
+      {
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.95. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "source": "graph",
+        "ref": "model:fraud_gbm_v1",
+        "entity_ids": []
+      },
+      {
+        "claim": "Customer reported the transaction as not theirs",
+        "source": "customer",
+        "ref": "trigger:HHG-003",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-4734",
+      "CC-4591",
+      "CC-3931",
+      "CC-2937",
+      "CC-4538"
+    ],
+    "summary": "Case HHG-003 was triggered by customer C08623 reporting an unauthorized $49.00 in-person transaction (txn 3530164) on card C08623-K2. An investigation revealed an episode of two in-person transactions (txns 3527215 and 3530164) between 2016-12-09 12:36:58 and 2016-12-10 13:01:21 totaling $108.00 in billing region 330. This activity matched an out-of-region pattern representing only 4.3% of prior card activity while home activity continued in parallel, resulting in a calibrated fraud probability of 0.95. Card C08623-K2 was blocked and a case was created, with no SAR filing required due to the low exposure.",
+    "written_to_graph": true,
+    "graph_case_id": "AC-HHG-003"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denies the transaction and the graph evidence supports fraud"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer dispute opens a case"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denies the transaction and the graph evidence supports fraud"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer dispute opens a case"
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": false,
+    "reason": "fraud strongly suspected but exposure $108.00 is under $1,000 with no shared origin or coordination: case only",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "Probability 0.95 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
+  "tool_calls": 6,
+  "tokens": 3297,
+  "latency_s": 10.8
+}

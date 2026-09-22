@@ -1,0 +1,131 @@
+{
+  "case_id": "HHG-020",
+  "case": {
+    "status": "closed_legitimate",
+    "verdict": "legitimate",
+    "fraud_probability": 0.05,
+    "pattern": "none",
+    "pattern_description": "",
+    "affected_txn_ids": [],
+    "first_suspicious_txn_id": "",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 0,
+    "evidence": [
+      {
+        "claim": "Flagged online transaction of $125.08 (product R) against a card baseline of 82 prior transactions averaging $218.79 (z=-0.2)",
+        "source": "graph",
+        "ref": "query:card_txns(cardv=C12265-K2)",
+        "entity_ids": [
+          "3509359"
+        ]
+      },
+      {
+        "claim": "Device profile Trident/7.0 | Windows 10 | ie 11.0 for desktop | 1920x1080 (D000179) used on 254 card(s); 0 of them have confirmed-fraud closed cases; too common a profile to count as a shared origin (fraud share below the enrichment threshold)",
+        "source": "graph",
+        "ref": "query:device_txns(devv=D000179) + query:device_closed_cases(devv=D000179)",
+        "entity_ids": [
+          "D000179"
+        ]
+      },
+      {
+        "claim": "Identity record marks the device as New for this account",
+        "source": "graph",
+        "ref": "query:card_txns(dev_new, proxy_type)",
+        "entity_ids": [
+          "3509359"
+        ]
+      },
+      {
+        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "source": "graph",
+        "ref": "query:similar_cases(vector k=5)",
+        "entity_ids": [
+          "CC-1284",
+          "CC-1287",
+          "CC-1214",
+          "CC-0120",
+          "CC-4259"
+        ]
+      },
+      {
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 1: Card testing",
+        "source": "document",
+        "ref": "query:policy_search(vector k=4)",
+        "entity_ids": [
+          "pattern:001",
+          "policy:009",
+          "pattern:000"
+        ]
+      },
+      {
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 0.24; calibrated to 0.05. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "source": "graph",
+        "ref": "model:fraud_gbm_v1",
+        "entity_ids": []
+      },
+      {
+        "claim": "Customer reply (simulated): Customer confirms the purchase (new device / travel / intended purchase)",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-1284",
+      "CC-1287",
+      "CC-1214",
+      "CC-0120",
+      "CC-4259"
+    ],
+    "summary": "Case HHG-020 was opened for customer C12265 after online transaction 3509359 for $125.08 on card C12265-K2 was flagged by the real-time model with a score of 0.52 from a new device. The transaction amount aligns well with historical baseline spending (82 prior transactions averaging $218.79, z=-0.2), and the device profile D000179 has zero confirmed fraud across 254 cards. Customer verification was performed, and the customer confirmed the transaction as an intended purchase. Consequently, the fraud probability was calibrated to 0.05, leading to a verdict of legitimate with no fraud reported.",
+    "written_to_graph": true,
+    "graph_case_id": "AC-HHG-020"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 6,
+      "assumed_response": "Customer confirms the purchase (new device / travel / intended purchase)"
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: probability 0.35 with 1 independent signal(s); verify before any block"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Probability >= 0.30 and evidence is requested (3a)"
+      }
+    ],
+    "final": [
+      {
+        "action": "CLOSE_NO_FRAUD",
+        "route": "auto",
+        "reason": "R3: customer confirms the transaction"
+      },
+      {
+        "action": "ALLOW_TRANSACTION",
+        "route": "auto",
+        "reason": "R3: let the transaction stand"
+      }
+    ],
+    "what_changed": "Initial actions to create a case and verify with the customer transitioned to allowing the transaction and closing as no fraud once customer C12265 verified the legitimate purchase."
+  },
+  "sar": {
+    "file": false,
+    "reason": "verdict is not fraud: no regulatory report",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "Probability 0.05 with 1 independent signal(s) and a customer confirms reply; further steps would not change the recommended actions (policy section 6).",
+  "tool_calls": 8,
+  "tokens": 2789,
+  "latency_s": 9.1
+}

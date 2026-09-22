@@ -1,0 +1,141 @@
+{
+  "case_id": "HHG-005",
+  "case": {
+    "status": "open",
+    "verdict": "uncertain",
+    "fraud_probability": 0.45,
+    "pattern": "card_not_present_new_device",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3523199"
+    ],
+    "first_suspicious_txn_id": "3523199",
+    "connected_card_ids": [],
+    "connected_device_profiles": [
+      "iOS Device | iOS 9.3.5 | mobile safari 9.0 | 1024x768"
+    ],
+    "exposure_usd": 100.07,
+    "evidence": [
+      {
+        "claim": "Flagged online transaction of $100.07 (product R) against a card baseline of 90 prior transactions averaging $177.52 (z=-0.3)",
+        "source": "graph",
+        "ref": "query:card_txns(cardv=C02923-K1)",
+        "entity_ids": [
+          "3523199"
+        ]
+      },
+      {
+        "claim": "Device profile iOS Device | iOS 9.3.5 | mobile safari 9.0 | 1024x768 (D000289) used on 112 card(s); 1 of them have confirmed-fraud closed cases; too common a profile to count as a shared origin (fraud share below the enrichment threshold)",
+        "source": "graph",
+        "ref": "query:device_txns(devv=D000289) + query:device_closed_cases(devv=D000289)",
+        "entity_ids": [
+          "D000289",
+          "C05551-K2"
+        ]
+      },
+      {
+        "claim": "Identity record marks the device as New for this account",
+        "source": "graph",
+        "ref": "query:card_txns(dev_new, proxy_type)",
+        "entity_ids": [
+          "3523199"
+        ]
+      },
+      {
+        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "source": "graph",
+        "ref": "query:similar_cases(vector k=5)",
+        "entity_ids": [
+          "CC-3105",
+          "CC-0641",
+          "CC-1024",
+          "CC-1287",
+          "CC-1006"
+        ]
+      },
+      {
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 1: Card testing; Pattern 3: Card-not-present fraud from a new device",
+        "source": "document",
+        "ref": "query:policy_search(vector k=4)",
+        "entity_ids": [
+          "pattern:001",
+          "pattern:000",
+          "pattern:002"
+        ]
+      },
+      {
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 0.45; calibrated to 0.45. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "source": "graph",
+        "ref": "model:fraud_gbm_v1",
+        "entity_ids": []
+      },
+      {
+        "claim": "Customer reply (simulated): No reply from the customer within 24 hours",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-3105",
+      "CC-0641",
+      "CC-1024",
+      "CC-1287",
+      "CC-1006"
+    ],
+    "summary": "Case HHG-005 was triggered by online transaction 3523199 for $100.07 on card C02923-K1 (customer C02923) on 2016-12-07 21:38:37 in region 330. The activity matched a card-not-present new device pattern via device profile D000289 (iOS Device | iOS 9.3.5 | mobile safari 9.0 | 1024x768), with a model-estimated fraud probability of 0.45. Outreach was attempted, but no response was received from the customer within 24 hours. Given the uncertain verdict and unresolved customer verification, transaction 3523199 is declined and card C02923-K1 is placed on monitoring.",
+    "written_to_graph": true,
+    "graph_case_id": "AC-HHG-005"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 6,
+      "assumed_response": "No reply from the customer within 24 hours"
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: probability 0.45 with 1 independent signal(s); verify before any block"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Probability >= 0.30 and evidence is requested (3a)"
+      }
+    ],
+    "final": [
+      {
+        "action": "MONITOR_CARD",
+        "route": "auto",
+        "reason": "R4: no reply within 24 hours; raise monitoring for 72 hours"
+      },
+      {
+        "action": "DECLINE_TRANSACTION",
+        "route": "L1",
+        "reason": "R4: decline pending authorizations"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Evidence requested and unanswered"
+      }
+    ],
+    "what_changed": "Initial actions called for customer verification and case creation, but because no reply was received from the customer within 24 hours, the final actions were updated to decline transaction 3523199 and monitor card C02923-K1."
+  },
+  "sar": {
+    "file": false,
+    "reason": "verdict is not fraud: no regulatory report",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "Probability 0.45 with 1 independent signal(s) and a customer no_reply reply; further steps would not change the recommended actions (policy section 6).",
+  "tool_calls": 8,
+  "tokens": 3015,
+  "latency_s": 10.8
+}

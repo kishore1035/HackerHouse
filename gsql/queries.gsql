@@ -1,0 +1,66 @@
+USE GRAPH FraudGraph
+
+CREATE OR REPLACE QUERY card_txns(VERTEX<Card> cardv) FOR GRAPH FraudGraph SYNTAX V2 {
+  /* every transaction on a card with the attributes the investigator needs */
+  Start = {cardv};
+  T = SELECT t FROM Start:s -(MADE>)- Transaction:t;
+  PRINT T[T.amount, T.ts, T.product, T.channel, T.risk_score, T.card_id, T.region, T.country, T.p_email, T.r_email, T.device_id,
+          T.dist1, T.d1, T.c1, T.c2, T.c5, T.c13, T.c14, T.m_false, T.m_true, T.dev_new, T.proxy_type, T.match_status] AS txns;
+}
+
+CREATE OR REPLACE QUERY device_txns(VERTEX<DeviceProfile> devv) FOR GRAPH FraudGraph SYNTAX V2 {
+  /* device -> transactions -> cards: who else used this device profile */
+  Start = {devv};
+  T = SELECT t FROM Start:d -(DEVICE_OF>)- Transaction:t;
+  PRINT T[T.amount, T.ts, T.card_id] AS txns;
+}
+
+CREATE OR REPLACE QUERY device_closed_cases(VERTEX<DeviceProfile> devv) FOR GRAPH FraudGraph SYNTAX V2 {
+  /* device -> transactions -> closed cases: prior outcomes tied to this device */
+  Start = {devv};
+  T = SELECT t FROM Start:d -(DEVICE_OF>)- Transaction:t;
+  C = SELECT c FROM T:t -(INVOLVED_IN>)- ClosedCase:c;
+  PRINT C[C.card_id, C.outcome, C.pattern, C.closed_at, C.exposure] AS cases;
+}
+
+CREATE OR REPLACE QUERY card_closed_cases(VERTEX<Card> cardv) FOR GRAPH FraudGraph SYNTAX V2 {
+  /* closed cases opened on, or connected to, this card */
+  Start = {cardv};
+  C1 = SELECT c FROM Start:s -(CASE_ON>)- ClosedCase:c;
+  C2 = SELECT c FROM Start:s -(CONNECTED_CASE>)- ClosedCase:c;
+  PRINT C1[C1.card_id, C1.outcome, C1.pattern, C1.closed_at, C1.exposure] AS own_cases;
+  PRINT C2[C2.card_id, C2.outcome, C2.pattern, C2.closed_at, C2.exposure] AS connected_cases;
+}
+
+CREATE OR REPLACE QUERY ring_expand(VERTEX<Card> cardv, INT days = 30, INT min_shared = 1) FOR GRAPH FraudGraph SYNTAX V2 {
+  /* multi-hop: card -> its devices -> other cards on those devices. Ranks connected cards by shared devices. */
+  MapAccum<STRING, SetAccum<STRING>> @@dev_cards;
+  MapAccum<STRING, SetAccum<STRING>> @@card_devs;
+  Start = {cardv};
+  Tx = SELECT t FROM Start:s -(MADE>)- Transaction:t;
+  Dv = SELECT d FROM Tx:t -(FROM_DEVICE>)- DeviceProfile:d;
+  Tx2 = SELECT t2 FROM Dv:d -(DEVICE_OF>)- Transaction:t2
+        ACCUM @@dev_cards += (d.id -> t2.card_id), @@card_devs += (t2.card_id -> d.id);
+  PRINT @@dev_cards AS device_to_cards;
+  PRINT @@card_devs AS card_to_devices;
+}
+
+CREATE OR REPLACE QUERY region_window(VERTEX<BillingRegion> regv, DATETIME t0, DATETIME t1) FOR GRAPH FraudGraph SYNTAX V2 {
+  /* cards with activity in one billing region inside a time window: region-cluster evidence */
+  MapAccum<STRING, SumAccum<DOUBLE>> @@spend;
+  MapAccum<STRING, SumAccum<INT>> @@n;
+  Start = {regv};
+  T = SELECT t FROM Start:r -(BILLING_OF>)- Transaction:t
+      WHERE t.ts >= t0 AND t.ts <= t1
+      ACCUM @@spend += (t.card_id -> t.amount), @@n += (t.card_id -> 1);
+  PRINT @@n AS txn_count_by_card, @@spend AS spend_by_card;
+}
+
+CREATE OR REPLACE QUERY card_neighbors_of_case(VERTEX<ClosedCase> casev) FOR GRAPH FraudGraph SYNTAX V2 {
+  /* closed case -> involved transactions -> devices; cards connected by the analysts */
+  Start = {casev};
+  Cn = SELECT c FROM Start:s -(CONNECTED_TO>)- Card:c;
+  PRINT Cn[Cn.customer_id] AS connected;
+}
+
+INSTALL QUERY ALL

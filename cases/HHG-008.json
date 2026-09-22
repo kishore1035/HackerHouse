@@ -1,0 +1,131 @@
+{
+  "case_id": "HHG-008",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.98,
+    "pattern": "card_not_present_fraud",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3557979",
+      "3557987",
+      "3558054"
+    ],
+    "first_suspicious_txn_id": "3557979",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 166.97,
+    "evidence": [
+      {
+        "claim": "Flagged online transaction of $55.68 (product C) against a card baseline of 899 prior transactions averaging $54.02 (z=0.0)",
+        "source": "graph",
+        "ref": "query:card_txns(cardv=C13171-K2)",
+        "entity_ids": [
+          "3558054"
+        ]
+      },
+      {
+        "claim": "3 transactions on this card between 2016-12-19 21:48:32 and 2016-12-19 22:08:56 form one episode (episode model over graph features), total $166.97",
+        "source": "graph",
+        "ref": "model:episode_membership_v1",
+        "entity_ids": [
+          "3557979",
+          "3557987",
+          "3558054"
+        ]
+      },
+      {
+        "claim": "Device profile chrome 66.0 (D008470) used on 175 card(s); 0 of them have confirmed-fraud closed cases; too common a profile to count as a shared origin (fraud share below the enrichment threshold)",
+        "source": "graph",
+        "ref": "query:device_txns(devv=D008470) + query:device_closed_cases(devv=D008470)",
+        "entity_ids": [
+          "D008470"
+        ]
+      },
+      {
+        "claim": "Case memory: 5 most similar closed cases, 5 confirmed fraud (card_not_present_fraud, card_not_present_new_device, undocumented)",
+        "source": "graph",
+        "ref": "query:similar_cases(vector k=5)",
+        "entity_ids": [
+          "CC-3960",
+          "CC-3841",
+          "CC-2681",
+          "CC-5520",
+          "CC-4124"
+        ]
+      },
+      {
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 4: Out-of-region use",
+        "source": "document",
+        "ref": "query:policy_search(vector k=4)",
+        "entity_ids": [
+          "pattern:001",
+          "policy:009",
+          "pattern:003"
+        ]
+      },
+      {
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.98. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "source": "graph",
+        "ref": "model:fraud_gbm_v1",
+        "entity_ids": []
+      },
+      {
+        "claim": "Customer reported the transaction as not theirs",
+        "source": "customer",
+        "ref": "trigger:HHG-008",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-3960",
+      "CC-3841",
+      "CC-2681",
+      "CC-5520",
+      "CC-4124"
+    ],
+    "summary": "Customer C13171 alerted the bank after identifying an unauthorized online charge of $55.68 (transaction 3558054) on card C13171-K2. Subsequent analysis revealed an episode of three rapid online transactions for product C occurring between 2016-12-19 21:48:32 and 2016-12-19 22:08:56, resulting in a total exposure of $166.97. The supervised graph model evaluated the activity with a calibrated fraud probability of 0.98, consistent with five similar historical card-not-present fraud cases. Card blocking and case creation were executed to halt further unauthorized transactions.",
+    "written_to_graph": true,
+    "graph_case_id": "AC-HHG-008"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denies the transaction and the graph evidence supports fraud"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer dispute opens a case"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denies the transaction and the graph evidence supports fraud"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer dispute opens a case"
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": false,
+    "reason": "fraud strongly suspected but exposure $166.97 is under $1,000 with no shared origin or coordination: case only",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "Probability 0.98 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
+  "tool_calls": 8,
+  "tokens": 2950,
+  "latency_s": 10.4
+}

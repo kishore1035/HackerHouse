@@ -1,0 +1,111 @@
+{
+  "case_id": "HHG-009",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.96,
+    "pattern": "card_not_present_fraud",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3581141"
+    ],
+    "first_suspicious_txn_id": "3581141",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 30.02,
+    "evidence": [
+      {
+        "claim": "Flagged online transaction of $30.02 (product S) against a card baseline of 46 prior transactions averaging $65.98 (z=-0.5)",
+        "source": "graph",
+        "ref": "query:card_txns(cardv=C08299-K1)",
+        "entity_ids": [
+          "3581141"
+        ]
+      },
+      {
+        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "source": "graph",
+        "ref": "query:similar_cases(vector k=5)",
+        "entity_ids": [
+          "CC-4027",
+          "CC-3639",
+          "CC-0034",
+          "CC-4783",
+          "CC-3050"
+        ]
+      },
+      {
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 1: Card testing",
+        "source": "document",
+        "ref": "query:policy_search(vector k=4)",
+        "entity_ids": [
+          "pattern:001",
+          "policy:009",
+          "pattern:000"
+        ]
+      },
+      {
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.96. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "source": "graph",
+        "ref": "model:fraud_gbm_v1",
+        "entity_ids": []
+      },
+      {
+        "claim": "Customer reported the transaction as not theirs",
+        "source": "customer",
+        "ref": "trigger:HHG-009",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-4027",
+      "CC-3639",
+      "CC-0034",
+      "CC-4783",
+      "CC-3050"
+    ],
+    "summary": "Case HHG-009 was initiated following a report from customer C08299 stating that an online transaction of $30.02 on card C08299-K1 was unauthorized. Transaction 3581141 occurred on 2016-12-28 12:10:53 in region 203 for product S. A supervised model evaluated the activity with a calibrated fraud probability of 0.96 under the card-not-present fraud typology. The card was blocked and a case was created, with total exposure limited to $30.02.",
+    "written_to_graph": true,
+    "graph_case_id": "AC-HHG-009"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denies the transaction and the graph evidence supports fraud"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer dispute opens a case"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denies the transaction and the graph evidence supports fraud"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer dispute opens a case"
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": false,
+    "reason": "fraud strongly suspected but exposure $30.02 is under $1,000 with no shared origin or coordination: case only",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "Probability 0.96 with 0 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
+  "tool_calls": 6,
+  "tokens": 2383,
+  "latency_s": 8.2
+}

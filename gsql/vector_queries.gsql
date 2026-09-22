@@ -1,0 +1,18 @@
+USE GRAPH FraudGraph
+
+CREATE OR REPLACE QUERY similar_cases(LIST<FLOAT> qv, INT k = 5) FOR GRAPH FraudGraph SYNTAX V2 {
+  /* GraphRAG step 1: vector similarity over closed-case narratives */
+  MapAccum<VERTEX, FLOAT> @@dist;
+  Top = vectorSearch({ClosedCase.emb}, qv, k, {distance_map: @@dist});
+  PRINT Top[Top.card_id, Top.outcome, Top.pattern, Top.notes, Top.exposure, Top.actions, Top.report_filed] AS cases;
+  PRINT @@dist AS distances;
+}
+
+CREATE OR REPLACE QUERY policy_search(LIST<FLOAT> qv, INT k = 4) FOR GRAPH FraudGraph SYNTAX V2 {
+  /* GraphRAG step 2: vector similarity over fraud policy, pattern definitions and regulatory guidance */
+  MapAccum<VERTEX, FLOAT> @@dist;
+  Top = vectorSearch({PolicyChunk.emb}, qv, k, {distance_map: @@dist});
+  PRINT Top[Top.source, Top.section, Top.text] AS chunks;
+  PRINT @@dist AS distances;
+}
+INSTALL QUERY similar_cases, policy_search

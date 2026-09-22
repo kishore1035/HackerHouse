@@ -1,0 +1,137 @@
+{
+  "case_id": "HHG-016",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.96,
+    "pattern": "card_not_present_new_device",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3534820"
+    ],
+    "first_suspicious_txn_id": "3534820",
+    "connected_card_ids": [],
+    "connected_device_profiles": [
+      "Windows | edge 16.0"
+    ],
+    "exposure_usd": 59.67,
+    "evidence": [
+      {
+        "claim": "Flagged online transaction of $59.67 (product C) against a card baseline of 48 prior transactions averaging $39.80 (z=0.8)",
+        "source": "graph",
+        "ref": "query:card_txns(cardv=C09988-K1)",
+        "entity_ids": [
+          "3534820"
+        ]
+      },
+      {
+        "claim": "Device profile Windows | edge 16.0 (D000703) used on 163 card(s); 8 of them have confirmed-fraud closed cases; too common a profile to count as a shared origin (fraud share below the enrichment threshold)",
+        "source": "graph",
+        "ref": "query:device_txns(devv=D000703) + query:device_closed_cases(devv=D000703)",
+        "entity_ids": [
+          "D000703",
+          "C01521-K2",
+          "C03095-K2",
+          "C06899-K1",
+          "C07562-K2",
+          "C09791-K1",
+          "C10631-K1",
+          "C10837-K2",
+          "C12987-K1"
+        ]
+      },
+      {
+        "claim": "Identity record marks the device as New for this account",
+        "source": "graph",
+        "ref": "query:card_txns(dev_new, proxy_type)",
+        "entity_ids": [
+          "3534820"
+        ]
+      },
+      {
+        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "source": "graph",
+        "ref": "query:similar_cases(vector k=5)",
+        "entity_ids": [
+          "CC-5462",
+          "CC-0587",
+          "CC-1396",
+          "CC-0997",
+          "CC-4590"
+        ]
+      },
+      {
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 3: Card-not-present fraud from a new device",
+        "source": "document",
+        "ref": "query:policy_search(vector k=4)",
+        "entity_ids": [
+          "pattern:001",
+          "policy:009",
+          "pattern:002"
+        ]
+      },
+      {
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.96. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "source": "graph",
+        "ref": "model:fraud_gbm_v1",
+        "entity_ids": []
+      },
+      {
+        "claim": "Customer reported the transaction as not theirs",
+        "source": "customer",
+        "ref": "trigger:HHG-016",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-5462",
+      "CC-0587",
+      "CC-1396",
+      "CC-0997",
+      "CC-4590"
+    ],
+    "summary": "Case HHG-016 was opened after customer C09988 disputed an unauthorized online transaction of $59.67 on card C09988-K1 (transaction 3534820 on 2016-12-11 22:39:08). The transaction occurred via a new device profile D000703 (Windows | edge 16.0) against a card baseline of 48 prior transactions averaging $39.80 (z=0.8). The calibrated fraud probability is 0.96 under the card-not-present from a new device pattern. Based on customer notification and high model risk, the case is finalized as fraud with an exposure of $59.67. Actions remain to block the card and maintain the case file, with no SAR required.",
+    "written_to_graph": true,
+    "graph_case_id": "AC-HHG-016"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denies the transaction and the graph evidence supports fraud"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer dispute opens a case"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denies the transaction and the graph evidence supports fraud"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer dispute opens a case"
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": false,
+    "reason": "fraud strongly suspected but exposure $59.67 is under $1,000 with no shared origin or coordination: case only",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "Probability 0.96 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
+  "tool_calls": 8,
+  "tokens": 3275,
+  "latency_s": 11.6
+}

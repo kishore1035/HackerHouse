@@ -1,0 +1,152 @@
+{
+  "case_id": "HHG-014",
+  "case": {
+    "status": "escalated",
+    "verdict": "uncertain",
+    "fraud_probability": 0.48,
+    "pattern": "undocumented",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3478561"
+    ],
+    "first_suspicious_txn_id": "3478561",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 74.96,
+    "evidence": [
+      {
+        "claim": "Flagged online transaction of $74.96 (product C) against a card baseline of 71 prior transactions averaging $58.13 (z=0.5)",
+        "source": "graph",
+        "ref": "query:card_txns(cardv=C13487-K1)",
+        "entity_ids": [
+          "3478561"
+        ]
+      },
+      {
+        "claim": "Device profile SM-G935F Build/NRD90M | Android 7.0 | chrome 62.0 for android | 1920x1080 (D009705) used on 52 card(s); 4 of them have confirmed-fraud closed cases; too common a profile to count as a shared origin (fraud share below the enrichment threshold)",
+        "source": "graph",
+        "ref": "query:device_txns(devv=D009705) + query:device_closed_cases(devv=D009705)",
+        "entity_ids": [
+          "D009705",
+          "C03528-K1",
+          "C06617-K1",
+          "C09733-K1",
+          "C09998-K1"
+        ]
+      },
+      {
+        "claim": "Identity record marks the device as New for this account and the connection as an anonymous proxy",
+        "source": "graph",
+        "ref": "query:card_txns(dev_new, proxy_type)",
+        "entity_ids": [
+          "3478561"
+        ]
+      },
+      {
+        "claim": "Case memory: 5 most similar closed cases, 5 confirmed fraud (card_not_present_new_device)",
+        "source": "graph",
+        "ref": "query:similar_cases(vector k=5)",
+        "entity_ids": [
+          "CC-3350",
+          "CC-2065",
+          "CC-2073",
+          "CC-2279",
+          "CC-4911"
+        ]
+      },
+      {
+        "claim": "Policy and typology passages grounding the decision: Pattern 3: Card-not-present fraud from a new device; R5 Card testing.; Pattern 2: Card-not-present fraud",
+        "source": "document",
+        "ref": "query:policy_search(vector k=4)",
+        "entity_ids": [
+          "pattern:002",
+          "policy:009",
+          "pattern:001"
+        ]
+      },
+      {
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 0.39; calibrated to 0.48. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "source": "graph",
+        "ref": "model:fraud_gbm_v1",
+        "entity_ids": []
+      },
+      {
+        "claim": "Customer reply (simulated): No reply from the customer within 24 hours",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-3350",
+      "CC-2065",
+      "CC-2073",
+      "CC-2279",
+      "CC-4911"
+    ],
+    "summary": "On 2016-11-22 16:11:00, online transaction 3478561 for $74.96 (product C, region 191) was flagged on card C13487-K1 for customer C13487. The transaction was initiated via an anonymous proxy from device profile D009705, which is recorded as a new device for this account. Customer verification was initiated, but no response was received within 24 hours. Given a calibrated fraud probability of 0.48 and an uncertain verdict, the transaction was declined, the card placed on monitoring, and the case escalated to an analyst.",
+    "written_to_graph": true,
+    "graph_case_id": "AC-HHG-014"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 6,
+      "assumed_response": "No reply from the customer within 24 hours"
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: probability 0.48 with 2 independent signal(s); verify before any block"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Probability >= 0.30 and evidence is requested (3a)"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R8: uncertain verdict with exposure above $500 or conflicting evidence"
+      }
+    ],
+    "final": [
+      {
+        "action": "MONITOR_CARD",
+        "route": "auto",
+        "reason": "R4: no reply within 24 hours; raise monitoring for 72 hours"
+      },
+      {
+        "action": "DECLINE_TRANSACTION",
+        "route": "L1",
+        "reason": "R4: decline pending authorizations"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Evidence requested and unanswered"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R4/R8: no reply and exposure above $500, or conflicting evidence"
+      }
+    ],
+    "what_changed": "Initial actions were updated to replace customer verification with declining the transaction and monitoring the card because no reply was received from the customer within 24 hours."
+  },
+  "sar": {
+    "file": false,
+    "reason": "verdict is not fraud: no regulatory report",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "Probability 0.48 with 2 independent signal(s) and a customer no_reply reply; further steps would not change the recommended actions (policy section 6).",
+  "tool_calls": 8,
+  "tokens": 2828,
+  "latency_s": 8.8
+}

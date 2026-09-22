@@ -1,0 +1,35 @@
+USE GRAPH FraudGraph
+CREATE LOADING JOB load_tx FOR GRAPH FraudGraph {
+  DEFINE FILENAME f;
+  LOAD f
+    TO VERTEX Transaction VALUES ($0, $1, $2, $3, $4, $5, $6, $10, $11, $12, $13, $14, $23, $24, $25, $26, $27, $28, $29, $30, $31, $20, $21, $22, $19),
+    TO VERTEX Card VALUES ($6, $7, $8, $9),
+    TO VERTEX Customer VALUES ($7),
+    TO VERTEX DeviceProfile VALUES ($14, $15, $16, $17, $18, $19) WHERE $14 != "",
+    TO VERTEX EmailDomain VALUES ($12) WHERE $12 != "",
+    TO VERTEX BillingRegion VALUES ($10) WHERE $10 != "",
+    TO EDGE OWNS VALUES ($7, $6),
+    TO EDGE MADE VALUES ($6, $0),
+    TO EDGE FROM_DEVICE VALUES ($0, $14) WHERE $14 != "",
+    TO EDGE PURCHASER_EMAIL VALUES ($0, $12) WHERE $12 != "",
+    TO EDGE BILLED_IN VALUES ($0, $10) WHERE $10 != ""
+    USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+}
+CREATE LOADING JOB load_next FOR GRAPH FraudGraph {
+  DEFINE FILENAME f;
+  LOAD f TO EDGE NEXT VALUES ($0, $1) USING SEPARATOR=",", HEADER="true", EOL="\n";
+}
+CREATE LOADING JOB load_cases FOR GRAPH FraudGraph {
+  DEFINE FILENAME f;
+  LOAD f TO VERTEX ClosedCase VALUES ($0, $1, $2, $3, $4, $5, $6, $7, $9, $10, $12, $13, $14),
+         TO EDGE ON_CARD VALUES ($0, $2)
+    USING SEPARATOR=",", HEADER="true", EOL="\n", QUOTE="double";
+}
+CREATE LOADING JOB load_case_txn FOR GRAPH FraudGraph {
+  DEFINE FILENAME f;
+  LOAD f TO EDGE INVOLVES VALUES ($0, $1) USING SEPARATOR=",", HEADER="true", EOL="\n";
+}
+CREATE LOADING JOB load_case_conn FOR GRAPH FraudGraph {
+  DEFINE FILENAME f;
+  LOAD f TO EDGE CONNECTED_TO VALUES ($0, $1) USING SEPARATOR=",", HEADER="true", EOL="\n";
+}

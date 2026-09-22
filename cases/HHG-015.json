@@ -1,0 +1,123 @@
+{
+  "case_id": "HHG-015",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.92,
+    "pattern": "card_not_present_new_device",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3464869"
+    ],
+    "first_suspicious_txn_id": "3464869",
+    "connected_card_ids": [],
+    "connected_device_profiles": [
+      "Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050"
+    ],
+    "exposure_usd": 599.94,
+    "evidence": [
+      {
+        "claim": "Flagged online transaction of $599.94 (product R) against a card baseline of 68 prior transactions averaging $132.61 (z=3.5)",
+        "source": "graph",
+        "ref": "query:card_txns(cardv=C03042-K1)",
+        "entity_ids": [
+          "3464869"
+        ]
+      },
+      {
+        "claim": "Device profile Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050 (D001385) used on 8 card(s); 0 of them have confirmed-fraud closed cases; too common a profile to count as a shared origin (fraud share below the enrichment threshold)",
+        "source": "graph",
+        "ref": "query:device_txns(devv=D001385) + query:device_closed_cases(devv=D001385)",
+        "entity_ids": [
+          "D001385"
+        ]
+      },
+      {
+        "claim": "Identity record marks the device as New for this account",
+        "source": "graph",
+        "ref": "query:card_txns(dev_new, proxy_type)",
+        "entity_ids": [
+          "3464869"
+        ]
+      },
+      {
+        "claim": "Case memory: 5 most similar closed cases, 0 confirmed fraud (none)",
+        "source": "graph",
+        "ref": "query:similar_cases(vector k=5)",
+        "entity_ids": [
+          "CC-5462",
+          "CC-4259",
+          "CC-1131",
+          "CC-1396",
+          "CC-0997"
+        ]
+      },
+      {
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 3: Card-not-present fraud from a new device",
+        "source": "document",
+        "ref": "query:policy_search(vector k=4)",
+        "entity_ids": [
+          "pattern:001",
+          "policy:009",
+          "pattern:002"
+        ]
+      },
+      {
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.92. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "source": "graph",
+        "ref": "model:fraud_gbm_v1",
+        "entity_ids": []
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-5462",
+      "CC-4259",
+      "CC-1131",
+      "CC-1396",
+      "CC-0997"
+    ],
+    "summary": "On 2016-11-17 14:03:36, online transaction 3464869 for $599.94 (product R) was initiated in region 327 on card C03042-K1 associated with customer C03042. The transaction significantly deviated from the baseline of 68 prior transactions averaging $132.61 (z=3.5) and was conducted via a newly recognized device profile (D001385). Supervised modeling estimated a calibrated fraud probability of 0.92, matching card-not-present fraud typologies. Preventive actions were taken to block card C03042-K1 and create a case, with no SAR required due to exposure remaining under $1,000.",
+    "written_to_graph": true,
+    "graph_case_id": "AC-HHG-015"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "Probability 0.92 with 2 independent signals; R1 verification not required above 0.70"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Probability >= 0.30"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "Probability 0.92 with 2 independent signals; R1 verification not required above 0.70"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "Probability >= 0.30"
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": false,
+    "reason": "fraud strongly suspected but exposure $599.94 is under $1,000 with no shared origin or coordination: case only",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "Probability 0.92 with 2 independent signal(s); further steps would not change the recommended actions (policy section 6).",
+  "tool_calls": 8,
+  "tokens": 2915,
+  "latency_s": 9.8
+}
