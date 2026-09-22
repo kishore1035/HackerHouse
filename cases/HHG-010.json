@@ -3,7 +3,7 @@
   "case": {
     "status": "closed_fraud",
     "verdict": "fraud",
-    "fraud_probability": 0.9,
+    "fraud_probability": 0.94,
     "pattern": "card_not_present_new_device",
     "pattern_description": "",
     "affected_txn_ids": [
@@ -49,42 +49,42 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (card_not_present_new_device, none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 4 confirmed fraud (card_not_present_new_device, none)",
         "source": "graph",
         "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
-          "CC-0986",
-          "CC-3105",
-          "CC-2323",
-          "CC-3148",
-          "AC-HHG-005"
+          "AC-HHG-010",
+          "AC-HHG-015",
+          "AC-HHG-016",
+          "AC-HHG-004",
+          "CC-0986"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 3: Card-not-present fraud from a new device; R5 Card testing.; Pattern 2: Card-not-present fraud",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 1: Card testing; R5 Card testing.",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "pattern:002",
-          "policy:009",
-          "pattern:001"
+          "pattern:001",
+          "pattern:000",
+          "policy:009"
         ]
       },
       {
-        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.90. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.94. Undocumented V/C/D/M columns are used only as anonymous model inputs",
         "source": "graph",
         "ref": "model:fraud_gbm_v1",
         "entity_ids": []
       }
     ],
     "similar_prior_cases": [
-      "CC-0986",
-      "CC-3105",
-      "CC-2323",
-      "CC-3148",
-      "AC-HHG-005"
+      "AC-HHG-010",
+      "AC-HHG-015",
+      "AC-HHG-016",
+      "AC-HHG-004",
+      "CC-0986"
     ],
-    "summary": "Case HHG-010 was opened for customer C10434 after real-time monitoring flagged online transaction 3506725 on card C10434-K1 for $1,000.03 on 2016-12-02 15:18:27. The transaction for product R in region 469 was conducted from a new device profile D000253 and significantly deviated from the historical baseline of 33 transactions averaging $131.25 (z=4.9). The supervised model assigned a calibrated fraud probability of 0.90, matching card-not-present fraud patterns. Based on the confirmed fraud verdict and an exposure exceeding $1,000, final actions were taken to block the card, create a case, and file a regulatory report.",
+    "summary": "Case HHG-010 was triggered after real-time model scoring flagged transaction 3506725 on card C10434-K1 for customer C10434 with a score of 0.90. The online transaction for product R in region 469 totaled $1,000.03, which significantly exceeded the historical card baseline of 33 transactions averaging $131.25 (z=4.9). Identity records confirmed the transaction was initiated from a new device profile D000253 (Windows 10, Edge 16.0). With a calibrated fraud probability of 0.94 matching the card_not_present_new_device pattern, the activity was determined to be fraud with an exposure of $1,000.03.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-010"
   },
@@ -94,7 +94,7 @@
       {
         "action": "BLOCK_CARD",
         "route": "L1",
-        "reason": "Probability 0.90 with 2 independent signals; R1 verification not required above 0.70"
+        "reason": "Probability 0.94 with 2 independent signals; R1 verification not required above 0.70"
       },
       {
         "action": "CREATE_CASE",
@@ -111,7 +111,7 @@
       {
         "action": "BLOCK_CARD",
         "route": "L1",
-        "reason": "Probability 0.90 with 2 independent signals; R1 verification not required above 0.70"
+        "reason": "Probability 0.94 with 2 independent signals; R1 verification not required above 0.70"
       },
       {
         "action": "CREATE_CASE",
@@ -129,7 +129,7 @@
   "sar": {
     "file": true,
     "reason": "exposure $1,000.03 exceeds $1,000",
-    "narrative": "This Suspicious Activity Report relates to customer C10434 and card C10434-K1 regarding suspected card-not-present fraud. On 2016-12-02 at 15:18:27, an online transaction (ID 3506725) was attempted for $1,000.03 under product code R in region 469. The transaction was conducted using device profile D000253 (Windows | Windows 10 | edge 16.0 | 1366x768), which was recorded as new for this account. The transaction amount of $1,000.03 represents an extreme deviation (z=4.9) from the cardholder's baseline of 33 prior transactions averaging $131.25. The supervised model utilizing over 60 graph-derived features generated a calibrated fraud probability of 0.90. The activity matches typologies for Pattern 3 (Card-not-present fraud from a new device) and Pattern 2 (Card-not-present fraud). Additionally, device profile D000253 has been observed on 209 cards, including 10 confirmed-fraud closed cases. Total financial exposure is $1,000.03, which exceeds the $1,000 filing threshold. The financial institution has taken risk mitigation actions by blocking card C10434-K1, creating case HHG-010, and submitting this report.",
+    "narrative": "This Suspicious Activity Report relates to customer C10434 and card account C10434-K1. On 2016-12-02 at 15:18:27, an online transaction (ID 3506725) was conducted for product R in region 469 totaling $1,000.03. The transaction was flagged by real-time monitoring with a risk score of 0.90. The transaction was processed via device profile D000253 running Windows 10 and Edge 16.0. Identity records confirm that device D000253 was newly observed on this customer account. The transaction amount of $1,000.03 represents a significant deviation from the account baseline of 33 transactions averaging $131.25, yielding a z-score of 4.9. Furthermore, case memory shows 4 of the 5 most similar prior cases were confirmed fraud under card-not-present typologies. Supervised machine learning models calibrated the fraud probability for this incident at 0.94 under the card_not_present_new_device pattern. Due to confirmed fraudulent indicators and an exposure amount of $1,000.03 exceeding the $1,000 threshold, the card was blocked and this report is submitted.",
     "subjects": [
       "C10434",
       "C10434-K1"
@@ -140,8 +140,8 @@
       "2016-12-02"
     ]
   },
-  "stop_reason": "Probability 0.90 with 2 independent signal(s); further steps would not change the recommended actions (policy section 6).",
+  "stop_reason": "Probability 0.94 with 2 independent signal(s); further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 9,
-  "tokens": 4257,
-  "latency_s": 12.6
+  "tokens": 3462,
+  "latency_s": 14.7
 }

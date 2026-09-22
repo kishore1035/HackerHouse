@@ -41,25 +41,25 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 2 confirmed fraud (card_not_present_new_device, none)",
         "source": "graph",
         "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
           "CC-3506",
           "CC-3416",
+          "AC-HHG-016",
           "CC-4395",
-          "CC-3873",
-          "CC-3734"
+          "AC-HHG-004"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 3: Card-not-present fraud from a new device; R4 No reply within 24 hours.; Pattern 2: Card-not-present fraud",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 3: Card-not-present fraud from a new device",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "pattern:002",
-          "policy:008",
-          "pattern:001"
+          "pattern:001",
+          "policy:009",
+          "pattern:002"
         ]
       },
       {
@@ -78,11 +78,11 @@
     "similar_prior_cases": [
       "CC-3506",
       "CC-3416",
+      "AC-HHG-016",
       "CC-4395",
-      "CC-3873",
-      "CC-3734"
+      "AC-HHG-004"
     ],
-    "summary": "Case HHG-013 was initiated following real-time model scoring of online transaction 3526826 for $35.66 on card C07671-K2 (customer C07671) on 2016-12-09 02:39:29. The transaction matched a card-not-present pattern from a new device profile (Windows | chrome 66.0, D008464) with a calibrated fraud probability of 0.92. When contacted, customer C07671 stated they still possessed the card but did not make the purchase. With unauthorized activity confirmed, final actions were taken to block the card with total exposure at $35.66.",
+    "summary": "Transaction 3526826 for $35.66 on card C07671-K2 belonging to customer C07671 was flagged by the real-time model on 2016-12-09 02:39:29. The transaction was conducted online using device D008464 (Windows | chrome 66.0), which was identified as a new device for this account. The customer was contacted and confirmed that they did not authorize the purchase while remaining in possession of the card. Based on the confirmed unauthorized activity and a calibrated fraud probability of 0.92, card C07671-K2 was blocked and the case was recorded.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-013"
   },
@@ -103,7 +103,7 @@
       {
         "action": "VERIFY_WITH_CUSTOMER",
         "route": "auto",
-        "reason": "R1: probability 0.88 with 1 independent signal(s); verify before any block"
+        "reason": "R1: probability 0.90 with 1 independent signal(s); verify before any block"
       },
       {
         "action": "CREATE_CASE",
@@ -123,7 +123,7 @@
         "reason": "R2: customer dispute opens a case"
       }
     ],
-    "what_changed": "Initial actions focused on customer verification and step-up authentication, but final actions shifted to blocking card C07671-K2 after the customer confirmed the transaction was unauthorized."
+    "what_changed": "Initial actions included customer verification and step-up authentication, but upon the customer confirming the transaction was unauthorized, the final actions escalated to blocking the card."
   },
   "sar": {
     "file": false,
@@ -135,6 +135,6 @@
   },
   "stop_reason": "Probability 0.92 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 9,
-  "tokens": 2761,
-  "latency_s": 9.8
+  "tokens": 2661,
+  "latency_s": 10.9
 }

@@ -1,13 +1,13 @@
 """Run the agent on the 20 exam cases; writes cases/<case_id>.json (+ traces for the UI)."""
 import sys, json, time, pandas as pd, pathlib
 sys.path.insert(0, "/home/vinay/hackerhouse")
-from agent.data_access import GraphClient
+from agent.data_access import make_graph_client
 from agent.investigator import Investigator
 
 OUT = pathlib.Path("/home/vinay/hackerhouse/cases"); OUT.mkdir(exist_ok=True)
 TR = pathlib.Path("/home/vinay/hackerhouse/data/traces"); TR.mkdir(exist_ok=True, parents=True)
 only = set(sys.argv[1:])
-g = GraphClient(); inv = Investigator(g)
+g = make_graph_client(); inv = Investigator(g)
 cp = pd.read_csv("/home/vinay/hackerhouse/data/HHGOA_IEEE/case_pack.csv")
 rows = []
 for r in cp.to_dict("records"):

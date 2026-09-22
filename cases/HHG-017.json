@@ -50,25 +50,25 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar prior cases (closed + agent), 3 confirmed fraud (card_not_present_new_device, none, undocumented)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 3 confirmed fraud (none, undocumented)",
         "source": "graph",
         "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
           "CC-3841",
           "CC-1092",
-          "AC-HHG-010",
           "CC-3907",
-          "CC-2096"
+          "CC-2096",
+          "CC-3748"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 4: Out-of-region use",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 4: Out-of-region use; Pattern 1: Card testing",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
           "pattern:001",
-          "policy:009",
-          "pattern:003"
+          "pattern:003",
+          "pattern:000"
         ]
       },
       {
@@ -87,11 +87,11 @@
     "similar_prior_cases": [
       "CC-3841",
       "CC-1092",
-      "AC-HHG-010",
       "CC-3907",
-      "CC-2096"
+      "CC-2096",
+      "CC-3748"
     ],
-    "summary": "Investigation of case HHG-017 confirmed card-not-present fraud on card C04570-K1 belonging to customer C04570, resulting in a total exposure of $300.14. The activity comprises an episode of three online transactions for product R in region 204 occurring between 2016-11-11 22:36:50 and 2016-11-11 23:46:24. When contacted, the customer stated they did not make the purchases and still retain physical possession of the card. In response, card C04570-K1 was blocked, and the case was documented with no SAR required due to exposure remaining below $1,000.",
+    "summary": "Case HHG-017 was opened following a real-time risk alert on transaction 3450629 ($100.09), which identified an episode of three online transactions totaling $300.14 on card C04570-K1 on 2016-11-11. All transactions occurred between 22:36:50 and 23:46:24 for product R in region 204. Customer C04570 confirmed they did not perform the transactions while still holding physical possession of the card, confirming card-not-present fraud with a calibrated probability of 0.92. Card C04570-K1 was blocked and the case logged, with no SAR required due to the $300.14 exposure falling below the $1,000 reporting threshold.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-017"
   },
@@ -132,7 +132,7 @@
         "reason": "R2: customer dispute opens a case"
       }
     ],
-    "what_changed": "Initial actions focused on customer verification and stepped-up authentication following the real-time scoring alert. After customer C04570 confirmed the transactions were unauthorized, the actions were updated to block card C04570-K1 and maintain the case."
+    "what_changed": "Initial verification and step-up authentication actions were replaced with BLOCK_CARD and CREATE_CASE once customer verification confirmed the charges were unauthorized. The card was blocked immediately to prevent additional fraudulent transactions."
   },
   "sar": {
     "file": false,
@@ -144,6 +144,6 @@
   },
   "stop_reason": "Probability 0.92 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 9,
-  "tokens": 3562,
-  "latency_s": 12.8
+  "tokens": 3942,
+  "latency_s": 12.1
 }

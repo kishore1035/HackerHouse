@@ -3,7 +3,7 @@
   "case": {
     "status": "closed_fraud",
     "verdict": "fraud",
-    "fraud_probability": 0.92,
+    "fraud_probability": 0.94,
     "pattern": "card_not_present_new_device",
     "pattern_description": "",
     "affected_txn_ids": [
@@ -41,42 +41,42 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 2 confirmed fraud (card_not_present_new_device, none)",
         "source": "graph",
         "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
+          "AC-HHG-016",
           "CC-5462",
+          "AC-HHG-015",
           "CC-0997",
-          "CC-4259",
-          "CC-1396",
-          "CC-1131"
+          "CC-4259"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 1: Card testing; Pattern 3: Card-not-present fraud from a new device",
+        "claim": "Policy and typology passages grounding the decision: Pattern 1: Card testing; Pattern 3: Card-not-present fraud from a new device; Pattern 2: Card-not-present fraud",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "policy:009",
           "pattern:000",
-          "pattern:002"
+          "pattern:002",
+          "pattern:001"
         ]
       },
       {
-        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.92. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.94. Undocumented V/C/D/M columns are used only as anonymous model inputs",
         "source": "graph",
         "ref": "model:fraud_gbm_v1",
         "entity_ids": []
       }
     ],
     "similar_prior_cases": [
+      "AC-HHG-016",
       "CC-5462",
+      "AC-HHG-015",
       "CC-0997",
-      "CC-4259",
-      "CC-1396",
-      "CC-1131"
+      "CC-4259"
     ],
-    "summary": "Case HHG-015 was initiated for customer C03042 after real-time monitoring scored online transaction 3464869 on card C03042-K1 at 0.77 on 2016-11-17 14:03:36. The $599.94 transaction for product R in region 327 significantly exceeded the customer baseline of 68 prior transactions averaging $132.61 (z=3.5). The transaction was initiated from a new device profile (D001385) for this account, resulting in a calibrated fraud probability of 0.92. Consistent with policy, the card was blocked and a case created, with no SAR required as total exposure is under $1,000.",
+    "summary": "On 2016-11-17 14:03:36, online transaction 3464869 for $599.94 on card C03042-K1 (customer C03042) was flagged by the real-time model with a risk score of 0.77. The purchase significantly deviates from the card baseline of 68 prior transactions averaging $132.61 (z=3.5) and originated from a newly identified device profile D001385. Supervised models calibrated the fraud probability at 0.94 under the card_not_present_new_device pattern. Final actions of blocking the card and creating a case were maintained for total exposure of $599.94.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-015"
   },
@@ -86,7 +86,7 @@
       {
         "action": "BLOCK_CARD",
         "route": "L1",
-        "reason": "Probability 0.92 with 2 independent signals; R1 verification not required above 0.70"
+        "reason": "Probability 0.94 with 2 independent signals; R1 verification not required above 0.70"
       },
       {
         "action": "CREATE_CASE",
@@ -98,7 +98,7 @@
       {
         "action": "BLOCK_CARD",
         "route": "L1",
-        "reason": "Probability 0.92 with 2 independent signals; R1 verification not required above 0.70"
+        "reason": "Probability 0.94 with 2 independent signals; R1 verification not required above 0.70"
       },
       {
         "action": "CREATE_CASE",
@@ -116,8 +116,8 @@
     "total_amount_usd": 0,
     "activity_dates": []
   },
-  "stop_reason": "Probability 0.92 with 2 independent signal(s); further steps would not change the recommended actions (policy section 6).",
+  "stop_reason": "Probability 0.94 with 2 independent signal(s); further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 9,
-  "tokens": 2884,
-  "latency_s": 11.7
+  "tokens": 3321,
+  "latency_s": 12.6
 }

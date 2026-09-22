@@ -3,7 +3,7 @@
   "case": {
     "status": "open",
     "verdict": "uncertain",
-    "fraud_probability": 0.45,
+    "fraud_probability": 0.46,
     "pattern": "card_not_present_new_device",
     "pattern_description": "",
     "affected_txn_ids": [
@@ -42,29 +42,29 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 1 confirmed fraud (card_not_present_new_device, none)",
         "source": "graph",
         "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
           "CC-3105",
           "CC-1024",
           "CC-1006",
-          "CC-0641",
-          "CC-1287"
+          "AC-HHG-010",
+          "CC-0641"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 1: Card testing; Pattern 2: Card-not-present fraud",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 1: Card testing",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
+          "pattern:001",
           "policy:009",
-          "pattern:000",
-          "pattern:001"
+          "pattern:000"
         ]
       },
       {
-        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 0.45; calibrated to 0.45. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 0.45; calibrated to 0.46. Undocumented V/C/D/M columns are used only as anonymous model inputs",
         "source": "graph",
         "ref": "model:fraud_gbm_v1",
         "entity_ids": []
@@ -80,10 +80,10 @@
       "CC-3105",
       "CC-1024",
       "CC-1006",
-      "CC-0641",
-      "CC-1287"
+      "AC-HHG-010",
+      "CC-0641"
     ],
-    "summary": "On 2016-12-07 21:38:37, transaction 3523199 for $100.07 (product R, region 330) on card C02923-K1 for customer C02923 was flagged for card-not-present risk on new device D000289. The supervised model estimated a calibrated fraud probability of 0.45 against a 90-transaction card baseline averaging $177.52. After customer C02923 failed to reply within 24 hours, the case verdict was set to uncertain with $100.07 in exposure. The bank proceeded to decline the transaction, monitor the card, and maintain the case.",
+    "summary": "Case HHG-005 was reviewed for customer C02923 and card C02923-K1 after real-time scoring flagged online transaction 3523199 for $100.07 on 2016-12-07 21:38:37 in region 330. The activity involved a newly identified device profile D000289 (iOS Device | iOS 9.3.5 | mobile safari 9.0 | 1024x768) associated with product R. With an uncertain verdict and a calibrated fraud probability of 0.46, verification was attempted but yielded no customer response within 24 hours. Consequently, transaction 3523199 was declined, the card was set to be monitored, and the case was documented with an exposure of $100.07.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-005"
   },
@@ -99,7 +99,7 @@
       {
         "action": "VERIFY_WITH_CUSTOMER",
         "route": "auto",
-        "reason": "R1: probability 0.45 with 1 independent signal(s); verify before any block"
+        "reason": "R1: probability 0.46 with 1 independent signal(s); verify before any block"
       },
       {
         "action": "CREATE_CASE",
@@ -124,7 +124,7 @@
         "reason": "Evidence requested and unanswered"
       }
     ],
-    "what_changed": "Initial actions to verify with the customer were escalated to declining transaction 3523199 and monitoring card C02923-K1 because no reply was received from customer C02923 within 24 hours."
+    "what_changed": "Initial actions focused on customer verification and case creation, but after no customer reply was received within 24 hours, the final actions were updated to decline the transaction and monitor the card."
   },
   "sar": {
     "file": false,
@@ -134,8 +134,8 @@
     "total_amount_usd": 0,
     "activity_dates": []
   },
-  "stop_reason": "Probability 0.45 with 1 independent signal(s) and a customer no_reply reply; further steps would not change the recommended actions (policy section 6).",
+  "stop_reason": "Probability 0.46 with 1 independent signal(s) and a customer no_reply reply; further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 9,
-  "tokens": 3298,
-  "latency_s": 10.6
+  "tokens": 2934,
+  "latency_s": 9.8
 }

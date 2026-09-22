@@ -49,13 +49,13 @@
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 1: Card testing; Pattern 3: Card-not-present fraud from a new device",
+        "claim": "Policy and typology passages grounding the decision: Pattern 3: Card-not-present fraud from a new device; R5 Card testing.; Pattern 2: Card-not-present fraud",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
+          "pattern:002",
           "policy:009",
-          "pattern:000",
-          "pattern:002"
+          "pattern:001"
         ]
       },
       {
@@ -78,7 +78,7 @@
       "CC-1287",
       "CC-1284"
     ],
-    "summary": "Case HHG-020 was initiated after transaction 3509359 for $125.08 on card C12265-K2 (customer C12265) was flagged by the real-time model with a score of 0.52. The online transaction occurred on 2016-12-03 06:04:26 in region 264 using a new device profile D000179. Upon inquiry, the customer confirmed the purchase as an authorized intended purchase on a new device. Given the customer confirmation and a calibrated fraud probability of 0.05, the transaction was determined to be legitimate.",
+    "summary": "Case HHG-020 was initiated for customer C12265 on card C12265-K2 after real-time scoring flagged online transaction 3509359 for $125.08 on 2016-12-03 06:04:26. The transaction for product R in region 264 was associated with a new device profile D000179, though the device has zero confirmed fraud cases across 254 cards and the amount was consistent with the card baseline average of $218.79 across 82 prior transactions (z=-0.2). Following initial review, customer verification was conducted, and customer C12265 confirmed the purchase. With a calibrated fraud probability of 0.05, the case is determined to be legitimate and closed with no fraud.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-020"
   },
@@ -114,7 +114,7 @@
         "reason": "R3: let the transaction stand"
       }
     ],
-    "what_changed": "Initial actions required customer verification and case creation, but following the customer's confirmation of the purchase, final actions shifted to allowing the transaction and closing the case as no fraud."
+    "what_changed": "Initial actions of VERIFY_WITH_CUSTOMER and CREATE_CASE were updated to CLOSE_NO_FRAUD and ALLOW_TRANSACTION after the customer confirmed the transaction was an intended purchase."
   },
   "sar": {
     "file": false,
@@ -126,6 +126,6 @@
   },
   "stop_reason": "Probability 0.05 with 1 independent signal(s) and a customer confirms reply; further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 9,
-  "tokens": 2504,
-  "latency_s": 9.5
+  "tokens": 2981,
+  "latency_s": 11.4
 }

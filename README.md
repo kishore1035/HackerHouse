@@ -15,6 +15,7 @@ An agentic fraud investigator for the TigerGraph x Hacker House Goa challenge. I
               8 remember     AgentCase vertex + edges + embedding written to TigerGraph
 
 - **Graph** (`gsql/`): Customer, Card, Transaction, DeviceProfile, EmailDomain, BillingRegion, ClosedCase, PolicyChunk, AgentCase; 590,742 transactions, 14,893 cards. TigerGraph 4.2.5 Community Edition in Docker. Vector attributes on ClosedCase, PolicyChunk, AgentCase.
+- **TigerGraph MCP** (`agent/mcp_client.py`): the agent talks to the graph through a persistent `tigergraph-mcp` stdio session — every read goes through `tigergraph__run_installed_query` / `tigergraph__get_node` / `tigergraph__get_vertex_count`, every case-memory write through `tigergraph__add_node` / `tigergraph__add_edge`. `MCPGraphClient` implements the same interface as the direct `GraphClient` (`agent/data_access.py`), verified for identical results on `card_txns`, `device_txns`, `device_closed_cases`, `ring_expand`, and `similar_cases`. `make_graph_client()` selects it by default and falls back to the direct pyTigerGraph client if `tigergraph-mcp` isn't installed or running (`USE_TIGERGRAPH_MCP=false` forces the fallback).
 - **LLM only reasons and writes.** Actions and approval routes come from the policy engine, so the LLM cannot breach policy.
 - **Models** (`scripts/train_models.py`, `scripts/train_episode.py`): gradient boosting over graph-derived features, trained on the closed cases. The bank risk score is deliberately excluded from the fraud model. Grouped 5-fold CV: fraud AUC 0.987, pattern accuracy 0.83, episode F1 0.80. The same feature code runs against an in-memory client (training) and the TigerGraph client (production); outputs were checked identical.
 - **UI** (`ui/index.html`, `api/app.py`): analyst dashboard with the alert queue, live streamed investigation timeline, uncertainty gauge, initial vs final actions, evidence with sources, SAR, graph view and case memory.
@@ -124,6 +125,7 @@ Backed by `api/app.py`: `GET /api/cases` (queue), `GET /api/cases/{id}` (detail)
     python scripts/load_graph.py
     python scripts/embed_and_load.py          # embeddings via OmniRoute into TigerGraph vectors
     python scripts/build_training_set.py && python scripts/train_models.py && python scripts/train_episode.py
+    pip install tigergraph-mcp                # TigerGraph MCP server the agent talks to (agent/mcp_client.py)
     python scripts/run_cases.py               # writes cases/HHG-001.json ... HHG-020.json
     uvicorn api.app:app --port 8088           # dashboard at http://127.0.0.1:8088
 
@@ -135,9 +137,9 @@ Secrets live in `.env` (git-ignored): `OMNIROUTE_BASE_URL`, `OMNIROUTE_API_KEY`,
 - No answer key is available, so benchmark accuracy is unmeasured. Cross-validated numbers above are on the closed cases only.
 - The closed cases have a distribution quirk: cleared cases sit on light cards with widely shared devices. Models can pick that up, so probabilities are shrunk and the agent runs a verification loop when signals are few.
 - Fraud episode reconstruction is weakest for account takeover on very heavy cards.
-- TigerGraph MCP is not wired in yet; the agent calls the same installed GSQL queries directly through pyTigerGraph.
-- Case memory now retrieves the agent's own prior investigations (`similar_agent_cases`, `gsql/vector_queries.gsql`) alongside closed-case history, merged by vector distance in `Investigator._graphrag`. Re-run `gsql/schema.gsql` and `gsql/vector_queries.gsql` to pick up the `AC_SIMILAR_AGENT` edge and new query before the next `run_cases.py`.
+- Case memory retrieves the agent's own prior investigations (`similar_agent_cases`, `gsql/vector_queries.gsql`) alongside closed-case history, merged by vector distance in `Investigator._graphrag`. Re-run `gsql/schema.gsql` and `gsql/vector_queries.gsql` to pick up the `AC_SIMILAR_AGENT` edge and new query before the next `run_cases.py`.
+- `tigergraph-mcp` logs a harmless `Deprecated parameter format` warning per scalar query parameter (it retries via GET and succeeds every time) — a JSON-RPC argument can't carry pyTigerGraph's Python-tuple VERTEX-typed-parameter convention, so the server falls back to its older plain-string path. Cosmetic only, verified against identical results from the direct client.
 
 ## Still to do for submission
 
-GitHub repo, 3-5 minute demo video, technical blog post, X/LinkedIn post tagging @TigerGraphDB.
+3-5 minute demo video. Technical blog post and X/LinkedIn post are drafted, pending posting.

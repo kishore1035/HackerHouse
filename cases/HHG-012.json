@@ -3,7 +3,7 @@
   "case": {
     "status": "closed_fraud",
     "verdict": "fraud",
-    "fraud_probability": 0.96,
+    "fraud_probability": 0.95,
     "pattern": "out_of_region_use",
     "pattern_description": "",
     "affected_txn_ids": [
@@ -31,29 +31,29 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar prior cases (closed + agent), 1 confirmed fraud (card_not_present_fraud, none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
         "source": "graph",
         "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
+          "AC-HHG-018",
           "CC-2937",
           "CC-0034",
           "CC-3931",
-          "AC-HHG-009",
           "CC-4158"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: R5 Card testing.; Pattern 2: Card-not-present fraud; Pattern 5: Account takeover",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 5: Account takeover",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
-          "policy:009",
           "pattern:001",
+          "policy:009",
           "pattern:004"
         ]
       },
       {
-        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.96. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.95. Undocumented V/C/D/M columns are used only as anonymous model inputs",
         "source": "graph",
         "ref": "model:fraud_gbm_v1",
         "entity_ids": []
@@ -66,13 +66,13 @@
       }
     ],
     "similar_prior_cases": [
+      "AC-HHG-018",
       "CC-2937",
       "CC-0034",
       "CC-3931",
-      "AC-HHG-009",
       "CC-4158"
     ],
-    "summary": "Case HHG-012 was initiated for customer C05876 regarding transaction 3553342 on card C05876-K2 totaling $30.91 on 2016-12-18 04:00:31. The in-person transaction in billing region 494 constituted an out-of-region use pattern, accounting for only 2.3% of the card's 910 historical transactions. Following initial outreach, the customer confirmed that they did not authorize the charge and remain in possession of the physical card. Based on the confirmed unauthorized activity and a calibrated fraud probability of 0.96, the event is classified as fraud.",
+    "summary": "Case HHG-012 was opened for customer C05876 following a real-time risk alert on in-person transaction 3553342 for $30.91 on 2016-12-18 04:00:31. The transaction occurred on card C05876-K2 in billing region 494 for product W, representing an out-of-region use pattern that accounts for only 2.3% of the card's prior activity. Following inquiry, the customer confirmed they did not authorize the purchase and still retain possession of the card. With a calibrated model fraud probability of 0.95, the incident is confirmed as fraud, resulting in the card being blocked and the case logged.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-012"
   },
@@ -88,7 +88,7 @@
       {
         "action": "VERIFY_WITH_CUSTOMER",
         "route": "auto",
-        "reason": "R1: probability 0.96 with 0 independent signal(s); verify before any block"
+        "reason": "R1: probability 0.95 with 0 independent signal(s); verify before any block"
       },
       {
         "action": "CREATE_CASE",
@@ -113,7 +113,7 @@
         "reason": "R2: customer dispute opens a case"
       }
     ],
-    "what_changed": "Initial actions focused on customer verification and escalation, which concluded once the customer confirmed the transaction was unauthorized while still holding the card. Final actions were updated to BLOCK_CARD and CREATE_CASE to immediately secure the compromised card against further unauthorized transactions."
+    "what_changed": "Initial actions included customer verification and escalation, which concluded upon receiving confirmation from the customer that the charge was unauthorized, resulting in the final actions to block card C05876-K2 and maintain the case record."
   },
   "sar": {
     "file": false,
@@ -123,8 +123,8 @@
     "total_amount_usd": 0,
     "activity_dates": []
   },
-  "stop_reason": "Probability 0.96 with 0 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
+  "stop_reason": "Probability 0.95 with 0 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 7,
-  "tokens": 3025,
-  "latency_s": 9.9
+  "tokens": 2909,
+  "latency_s": 15.5
 }

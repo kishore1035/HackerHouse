@@ -37,15 +37,15 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 1 confirmed fraud (none, out_of_region_use)",
         "source": "graph",
         "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
+          "AC-HHG-018",
           "CC-3931",
           "CC-3639",
-          "CC-3640",
-          "CC-0893",
-          "CC-3761"
+          "AC-HHG-003",
+          "CC-3640"
         ]
       },
       {
@@ -72,13 +72,13 @@
       }
     ],
     "similar_prior_cases": [
+      "AC-HHG-018",
       "CC-3931",
       "CC-3639",
-      "CC-3640",
-      "CC-0893",
-      "CC-3761"
+      "AC-HHG-003",
+      "CC-3640"
     ],
-    "summary": "Case HHG-018 was initiated following an inquiry from customer C02354 regarding an in-person transaction 3491361 of $39.08 for product W on card C02354-K2 on 2016-11-27 13:41:26 in region 126. An investigation revealed that the exact $39.08 amount had appeared 11 prior times on the card under the same product code as a recurring pattern, and billing region 126 accounted for 9.6% of previous activity. Upon verification, the customer recognized the charge as their own subscription after reviewing the recurring merchant and amount history. With a calibrated fraud probability of 0.05 and no confirmed fraud among similar historical cases, the case was determined legitimate and closed with the transaction allowed.",
+    "summary": "Case HHG-018 was opened after customer C02354 disputed an in-person transaction 3491361 for $39.08 on card C02354-K2 dated 2016-11-27 13:41:26. Historical analysis revealed that the identical amount of $39.08 under product code W appeared 11 times previously on this card, establishing a recurring pattern. Upon being presented with the merchant and amount history during customer verification, customer C02354 confirmed the transaction as their own subscription. With a calibrated fraud probability of 0.05, the activity is classified as legitimate.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-018"
   },
@@ -119,7 +119,7 @@
         "reason": "R3: let the transaction stand"
       }
     ],
-    "what_changed": "Initial actions to create a case, verify with the customer, and warn the customer were updated to closing the case as no fraud and allowing the transaction because the customer confirmed the charge as their own subscription."
+    "what_changed": "Initial actions to create a case, warn, and verify with the customer shifted to allowing the transaction and closing the case without fraud once the customer recognized and confirmed the subscription charge."
   },
   "sar": {
     "file": false,
@@ -131,6 +131,6 @@
   },
   "stop_reason": "Probability 0.05 with 1 independent signal(s) and a customer confirms reply; further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 7,
-  "tokens": 2842,
-  "latency_s": 12.4
+  "tokens": 2543,
+  "latency_s": 13.3
 }

@@ -74,6 +74,22 @@ class GraphClient:
     def _vt(rows, cols):
         return pd.DataFrame([{"v_id": r["v_id"], **{k.split(".")[-1]: v for k, v in r["attributes"].items()}} for r in rows]) if rows else pd.DataFrame(columns=["v_id"] + cols)
 
+    def get_vertex(self, vtype: str, vid):
+        try:
+            r = self.conn.getVerticesById(vtype, vid)
+            return r[0] if r else None
+        except Exception:
+            return None
+
+    def upsert_vertex(self, vtype: str, vid, attrs: dict):
+        return self.conn.upsertVertex(vtype, str(vid), attrs)
+
+    def upsert_edge(self, from_type: str, from_id, etype: str, to_type: str, to_id, attrs: dict | None = None):
+        return self.conn.upsertEdge(from_type, str(from_id), etype, to_type, str(to_id), attrs or {})
+
+    def vertex_counts(self) -> dict:
+        return self.conn.getVertexCount("*")
+
     def card_txns(self, card_id):
         r = self.q("card_txns", cardv=(card_id,))
         df = self._vt(r[0]["txns"], [])
@@ -116,3 +132,17 @@ class GraphClient:
     def ring_expand(self, card_id):
         r = self.q("ring_expand", cardv=(card_id,))
         return r[0]["device_to_cards"], r[1]["card_to_devices"]
+
+
+def make_graph_client(**kw):
+    """Per the HHGOA brief: 'Use TigerGraph MCP to expose graph capabilities and data to the agent.'
+    Set USE_TIGERGRAPH_MCP=false to force the direct pyTigerGraph client (e.g. tigergraph-mcp not installed)."""
+    import os
+    if os.environ.get("USE_TIGERGRAPH_MCP", "true").strip().lower() in ("1", "true", "yes"):
+        try:
+            from .mcp_client import MCPGraphClient
+            return MCPGraphClient(**kw)
+        except Exception as e:
+            import sys
+            print(f"TigerGraph MCP unavailable ({e}); falling back to the direct pyTigerGraph client", file=sys.stderr)
+    return GraphClient(**kw)

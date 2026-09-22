@@ -63,19 +63,19 @@
         "entity_ids": [
           "CC-2059",
           "CC-1219",
+          "AC-HHG-004",
           "CC-4163",
-          "CC-2063",
-          "CC-3204"
+          "AC-HHG-011"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 1: Card testing; Pattern 4: Out-of-region use",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 1: Card testing",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
           "pattern:001",
-          "pattern:000",
-          "pattern:003"
+          "policy:009",
+          "pattern:000"
         ]
       },
       {
@@ -94,11 +94,11 @@
     "similar_prior_cases": [
       "CC-2059",
       "CC-1219",
+      "AC-HHG-004",
       "CC-4163",
-      "CC-2063",
-      "CC-3204"
+      "AC-HHG-011"
     ],
-    "summary": "Customer C11923 reported an unauthorized $131.30 transaction (3583368) on card C11923-K2. An investigation identified a 4-transaction episode totaling $149.83 executed between 2016-12-27 05:19:26 and 2016-12-29 15:42:09. The activity originated from a newly observed device (D009680) matching card-not-present fraud patterns, yielding a calibrated fraud probability of 0.98. The case was finalized as confirmed fraud with the card blocked, and no SAR was required due to exposure remaining below $1,000.",
+    "summary": "Case HHG-011 was opened after customer C11923 reported an unauthorized $131.30 online transaction (txn 3583368) on card C11923-K2. Analysis identified an episode of 4 online transactions between 2016-12-27 05:19:26 and 2016-12-29 15:42:09 totaling $149.83. The transactions were initiated via a newly recognized device profile D009680 (SM-G610F Build/NRD90M | chrome 66.0 for android) following a card-testing pattern. Model evaluation indicated a 0.98 calibrated fraud probability, supported by 5 of 5 similar prior cases confirmed as card-not-present fraud. The card was blocked and a case created, with no SAR filed due to exposure remaining below $1,000 without coordinated network indicators.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-011"
   },
@@ -140,6 +140,6 @@
   },
   "stop_reason": "Probability 0.98 with 3 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 9,
-  "tokens": 3881,
-  "latency_s": 14.4
+  "tokens": 3642,
+  "latency_s": 17.0
 }

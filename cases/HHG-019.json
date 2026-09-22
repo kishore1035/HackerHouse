@@ -53,13 +53,13 @@
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 3: Card-not-present fraud from a new device; Pattern 4: Out-of-region use",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 3: Card-not-present fraud from a new device; R5 Card testing.",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
           "pattern:001",
           "pattern:002",
-          "pattern:003"
+          "policy:009"
         ]
       },
       {
@@ -82,7 +82,7 @@
       "CC-1445",
       "CC-0986"
     ],
-    "summary": "Case HHG-019 was initiated after real-time monitoring flagged online transaction 3503878 for $99.92 on card C07987-K2 (customer C07987) on 2016-12-01 17:28:53. The transaction originated in region 264 from a new device profile D008315, generating a calibrated fraud probability of 0.94. Customer verification confirmed that the customer did not make the purchase and still possesses the card. Based on the confirmed unauthorized activity, the case is concluded as card-not-present fraud from a new device with a total exposure of $99.92.",
+    "summary": "Case HHG-019 was opened after real-time scoring flagged online transaction 3503878 ($99.92) on card C07987-K2 for customer C07987 with a calibrated fraud probability of 0.94. The transaction took place on 2016-12-01 17:28:53 in region 264 using device D008315, which was identified as new to this account. Upon verification, the customer confirmed they did not make the purchase and are still in possession of the physical card. The incident is classified as card-not-present fraud from a new device, and card C07987-K2 has been blocked.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-019"
   },
@@ -123,7 +123,7 @@
         "reason": "R2: customer dispute opens a case"
       }
     ],
-    "what_changed": "Initial actions of step-up authentication and customer verification were transitioned to blocking card C07987-K2 and maintaining case creation once the customer confirmed the transaction was unauthorized."
+    "what_changed": "Initial actions included customer verification and step-up authentication, but upon the customer confirming the transaction was unauthorized while retaining physical possession of the card, the card was blocked to prevent further unauthorized activity."
   },
   "sar": {
     "file": false,
@@ -135,6 +135,6 @@
   },
   "stop_reason": "Probability 0.94 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 9,
-  "tokens": 2701,
-  "latency_s": 9.5
+  "tokens": 3072,
+  "latency_s": 10.5
 }

@@ -35,13 +35,13 @@
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R4 No reply within 24 hours.; R5 Card testing.",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 1: Card testing",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
           "pattern:001",
-          "policy:008",
-          "policy:009"
+          "policy:009",
+          "pattern:000"
         ]
       },
       {
@@ -64,7 +64,7 @@
       "CC-2695",
       "CC-3639"
     ],
-    "summary": "Case HHG-002 was opened after real-time monitoring flagged online transaction 3478782 for $292.36 on 2016-11-22 17:27:07 for card C11891-K1 (customer C11891), which deviated significantly from the card's 35-transaction baseline average of $44.66 (z=9.7). A supervised model estimated a calibrated fraud probability of 0.92 matching a card-not-present fraud pattern. When contacted, customer C11891 confirmed they still held the card and did not authorize the transaction. The final verdict is fraud, resulting in the card being blocked and the case recorded without a SAR filing as exposure is below $1,000.",
+    "summary": "On 2016-11-22 17:27:07, card C11891-K1 associated with customer C11891 attempted an online transaction (ID 3478782) of $292.36 for product C. This transaction triggered real-time scoring at 0.79 and exhibited a significant deviation (z=9.7) from the card's 35-transaction baseline average of $44.66, yielding a calibrated fraud probability of 0.92. Upon inquiry, the customer confirmed that they did not authorize the purchase and remained in physical possession of the card. The incident was classified as card-not-present fraud under case HHG-002, and card C11891-K1 was blocked.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-002"
   },
@@ -100,7 +100,7 @@
         "reason": "R2: customer dispute opens a case"
       }
     ],
-    "what_changed": "Initial actions were updated from VERIFY_WITH_CUSTOMER and CREATE_CASE to BLOCK_CARD and CREATE_CASE after customer C11891 confirmed the $292.36 transaction was unauthorized while remaining in possession of the card."
+    "what_changed": "Initial actions of VERIFY_WITH_CUSTOMER and CREATE_CASE were updated to BLOCK_CARD and CREATE_CASE after the customer confirmed the transaction was unauthorized. The card was blocked to prevent further card-not-present fraud while the cardholder still held the physical card."
   },
   "sar": {
     "file": false,
@@ -112,6 +112,6 @@
   },
   "stop_reason": "Probability 0.92 with 1 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 7,
-  "tokens": 2662,
-  "latency_s": 12.1
+  "tokens": 2399,
+  "latency_s": 11.6
 }

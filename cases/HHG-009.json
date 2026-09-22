@@ -3,7 +3,7 @@
   "case": {
     "status": "closed_fraud",
     "verdict": "fraud",
-    "fraud_probability": 0.96,
+    "fraud_probability": 0.97,
     "pattern": "card_not_present_fraud",
     "pattern_description": "",
     "affected_txn_ids": [
@@ -23,29 +23,29 @@
         ]
       },
       {
-        "claim": "Case memory: 5 most similar prior cases (closed + agent), 0 confirmed fraud (none)",
+        "claim": "Case memory: 5 most similar prior cases (closed + agent), 1 confirmed fraud (card_not_present_fraud, none)",
         "source": "graph",
         "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
+          "AC-HHG-009",
           "CC-0034",
           "CC-3050",
           "CC-3639",
-          "CC-4027",
-          "CC-4783"
+          "AC-HHG-018"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 1: Card testing",
+        "claim": "Policy and typology passages grounding the decision: Pattern 1: Card testing; Pattern 2: Card-not-present fraud; R5 Card testing.",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
+          "pattern:000",
           "pattern:001",
-          "policy:009",
-          "pattern:000"
+          "policy:009"
         ]
       },
       {
-        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.96. Undocumented V/C/D/M columns are used only as anonymous model inputs",
+        "claim": "Supervised model over 60+ graph-derived features (risk score excluded) estimates fraud probability 1.00; calibrated to 0.97. Undocumented V/C/D/M columns are used only as anonymous model inputs",
         "source": "graph",
         "ref": "model:fraud_gbm_v1",
         "entity_ids": []
@@ -58,13 +58,13 @@
       }
     ],
     "similar_prior_cases": [
+      "AC-HHG-009",
       "CC-0034",
       "CC-3050",
       "CC-3639",
-      "CC-4027",
-      "CC-4783"
+      "AC-HHG-018"
     ],
-    "summary": "On 2016-12-28 12:10:53, an online transaction (ID 3581141) of $30.02 for product S in region 203 was conducted on card C08299-K1 associated with customer C08299. Customer C08299 alerted the bank stating that they never made the $30.02 purchase and requested an account review. The supervised model calculated a calibrated fraud probability of 0.96, aligning with a card-not-present fraud pattern. In response, card C08299-K1 was blocked and a case was created for the total exposure of $30.02.",
+    "summary": "Customer C08299 reported an unauthorized online transaction of $30.02 (transaction ID 3581141) on card C08299-K1 for product S in region 203 on 2016-12-28 12:10:53. The transaction was flagged against a card baseline of 46 prior transactions averaging $65.98. A supervised model over 60+ graph-derived features estimated a calibrated fraud probability of 0.97, consistent with card-not-present fraud patterns. Initial and final actions were taken to block the card and maintain a case file, with total exposure limited to $30.02.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-009"
   },
@@ -104,8 +104,8 @@
     "total_amount_usd": 0,
     "activity_dates": []
   },
-  "stop_reason": "Probability 0.96 with 0 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
+  "stop_reason": "Probability 0.97 with 0 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 7,
-  "tokens": 2495,
-  "latency_s": 9.1
+  "tokens": 2459,
+  "latency_s": 9.2
 }

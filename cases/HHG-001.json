@@ -35,21 +35,21 @@
         "source": "graph",
         "ref": "query:similar_cases+similar_agent_cases(vector k=5)",
         "entity_ids": [
+          "AC-HHG-018",
           "CC-4437",
           "CC-0657",
-          "CC-4708",
           "CC-2770",
-          "CC-2283"
+          "CC-4734"
         ]
       },
       {
-        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; R5 Card testing.; Pattern 4: Out-of-region use",
+        "claim": "Policy and typology passages grounding the decision: Pattern 2: Card-not-present fraud; Pattern 4: Out-of-region use; R5 Card testing.",
         "source": "document",
         "ref": "query:policy_search(vector k=4)",
         "entity_ids": [
           "pattern:001",
-          "policy:009",
-          "pattern:003"
+          "pattern:003",
+          "policy:009"
         ]
       },
       {
@@ -66,13 +66,13 @@
       }
     ],
     "similar_prior_cases": [
+      "AC-HHG-018",
       "CC-4437",
       "CC-0657",
-      "CC-4708",
       "CC-2770",
-      "CC-2283"
+      "CC-4734"
     ],
-    "summary": "Case HHG-001 was initiated for customer C12382 regarding card C12382-K1 after transaction 3514030 for $77.07 on 2016-12-04 19:55:28 was flagged for out-of-region use in billing region 444. Region 444 accounts for only 2.8% of the card's historical activity, and home activity continued in parallel. When contacted, the customer stated they did not make the purchase and still hold the card. Based on a calibrated fraud probability of 0.92 and the customer's confirmation, the verdict is confirmed fraud with $77.07 in exposure.",
+    "summary": "Case HHG-001 was initiated after in-person transaction 3514030 for $77.07 on card C12382-K1 (customer C12382) on 2016-12-04 19:55:28 was flagged for out-of-region use in billing region 444. This card-present transaction occurred in a region accounting for only 2.8% of prior activity while home activity continued in parallel, resulting in a calibrated fraud probability of 0.92. Customer C12382 was contacted and confirmed that they still possessed the physical card and did not authorize the purchase. Based on the confirmed unauthorized activity, the verdict is fraud with total exposure of $77.07, and the card was blocked.",
     "written_to_graph": true,
     "graph_case_id": "AC-HHG-001"
   },
@@ -113,7 +113,7 @@
         "reason": "R2: customer dispute opens a case"
       }
     ],
-    "what_changed": "Initial actions included customer verification and escalation, which were transitioned to blocking card C12382-K1 and finalizing case creation once the customer confirmed the transaction was unauthorized."
+    "what_changed": "Initial actions to verify with customer and escalate to analyst were updated to permanently block card C12382-K1 and maintain case creation once the customer confirmed the $77.07 transaction was unauthorized."
   },
   "sar": {
     "file": false,
@@ -125,6 +125,6 @@
   },
   "stop_reason": "Probability 0.92 with 0 independent signal(s) and a customer denies reply; further steps would not change the recommended actions (policy section 6).",
   "tool_calls": 7,
-  "tokens": 2890,
-  "latency_s": 22.6
+  "tokens": 3118,
+  "latency_s": 19.0
 }

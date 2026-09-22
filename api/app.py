@@ -5,12 +5,12 @@ sys.path.insert(0, "/home/vinay/hackerhouse")
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from agent.data_access import GraphClient
+from agent.data_access import make_graph_client
 from agent.investigator import Investigator
 
 ROOT = pathlib.Path("/home/vinay/hackerhouse")
 app = FastAPI(title="FraudGraph Agent")
-graph = GraphClient()
+graph = make_graph_client()
 PACK = pd.read_csv(ROOT / "data/HHGOA_IEEE/case_pack.csv").to_dict("records")
 lock = threading.Lock()
 
@@ -45,8 +45,7 @@ def case(case_id: str):
 
 @app.get("/api/stats")
 def stats():
-    c = graph.conn
-    v = c.getVertexCount("*")
+    v = graph.vertex_counts()
     saved = [json.loads(p.read_text()) for p in (ROOT / "cases").glob("HHG-*.json")]
     return {"vertices": v, "transactions": v.get("Transaction"), "cards": v.get("Card"), "closed_cases": v.get("ClosedCase"), "agent_cases": v.get("AgentCase"),
             "investigated": len(saved), "sar": sum(1 for a in saved if a["sar"]["file"]), "avg_latency": round(sum(a["latency_s"] for a in saved) / max(len(saved), 1), 1)}

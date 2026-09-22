@@ -51,7 +51,7 @@ class Investigator:
 
     def _device_profile(self, dev):
         try:
-            v = self.g.conn.getVerticesById("DeviceProfile", dev)[0]["attributes"]
+            v = self.g.get_vertex("DeviceProfile", dev)["attributes"]
             return " | ".join(x for x in (v.get("device_info"), v.get("os"), v.get("browser"), v.get("screen")) if x)
         except Exception:
             return dev
