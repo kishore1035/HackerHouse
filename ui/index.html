@@ -5,834 +5,1277 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FraudGraph Agent</title>
 <style>
-:root{
-  /* Apple HIG Dark Mode Palette */
-  --bg-system: #000000;
-  --bg-grouped: #0c0c0e;
-  --bg-panel: rgba(24, 24, 28, 0.72);
-  --bg-card: rgba(32, 32, 36, 0.65);
-  --bg-card-hover: rgba(44, 44, 50, 0.75);
-  --bg-subtle: rgba(255, 255, 255, 0.05);
-  --bg-tag: rgba(255, 255, 255, 0.08);
+:root {
+  /* Supabase Studio Dark Palette */
+  --bg-system: #121212;
+  --bg-grouped: #171717;
+  --bg-sidebar: rgba(23, 23, 23, 0.85);
+  --bg-header: rgba(18, 18, 18, 0.92);
+  --bg-card: rgba(28, 28, 28, 0.72);
+  --bg-card-hover: rgba(38, 38, 38, 0.82);
+  --bg-subtle: rgba(255, 255, 255, 0.04);
+  --bg-subtle-hover: rgba(255, 255, 255, 0.08);
 
-  /* Apple System Colors */
-  --sys-blue: #0a84ff;
-  --sys-green: #30d158;
-  --sys-red: #ff453a;
-  --sys-orange: #ff9f0a;
-  --sys-yellow: #ffd60a;
-  --sys-purple: #bf5af2;
-  --sys-indigo: #5e5ce6;
-  --sys-teal: #64d2ff;
+  /* Supabase Emerald Brand & Accents */
+  --sb-brand: #3ecf8e;
+  --sb-brand-hover: #34b27b;
+  --sb-brand-subtle: rgba(62, 207, 142, 0.12);
+  --sb-brand-border: rgba(62, 207, 142, 0.35);
 
-  /* Apple Semantic Text Tiers */
-  --text-primary: #f5f5f7;
-  --text-secondary: #a1a1a6;
-  --text-tertiary: #6e6e73;
-  --text-quaternary: #48484a;
+  --sb-red: #ef4444;
+  --sb-red-subtle: rgba(239, 68, 68, 0.12);
+  --sb-red-border: rgba(239, 68, 68, 0.35);
 
-  /* Separators and Borders */
+  --sb-amber: #f59e0b;
+  --sb-amber-subtle: rgba(245, 158, 11, 0.12);
+  --sb-amber-border: rgba(245, 158, 11, 0.35);
+
+  --sb-blue: #3b82f6;
+  --sb-blue-subtle: rgba(59, 130, 246, 0.12);
+  --sb-blue-border: rgba(59, 130, 246, 0.35);
+
+  --sb-purple: #a855f7;
+  --sb-purple-subtle: rgba(168, 85, 247, 0.12);
+  --sb-purple-border: rgba(168, 85, 247, 0.35);
+
+  /* Typography Tiers */
+  --text-primary: #ededed;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-quaternary: #3f3f46;
+
+  /* Hairline Borders & Shadows */
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.16);
-  --border-focus: rgba(10, 132, 255, 0.55);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --border-hover: rgba(255, 255, 255, 0.18);
+  --border-focus: rgba(62, 207, 142, 0.55);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
 
-  /* Radii & Typography */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  /* Geometry & Physics */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-pill: 9999px;
-  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
   --font-mono: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas, monospace;
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-fluid: cubic-bezier(0.34, 1.56, 0.64, 1.0);
 }
 
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{
-  height:100%;
-  background:var(--bg-system);
-  color:var(--text-primary);
-  font:13.5px/1.45 var(--font-system);
-  letter-spacing:-0.01em;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  overflow:hidden;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg-system);
+  color: var(--text-primary);
+  font: 13px/1.45 var(--font-system);
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
 }
 
-/* App Frame Layout */
-.app{
-  display:grid;
-  grid-template-columns:320px 1fr;
-  grid-template-rows:52px 1fr;
-  height:100vh;
-  background:var(--bg-system);
+/* App Layout Grid */
+.app {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: 50px 1fr;
+  height: 100vh;
+  background: var(--bg-system);
 }
 
-/* macOS-style Header / Toolbar */
-header{
-  grid-column:1/3;
-  display:flex;
-  align-items:center;
-  gap:16px;
-  padding:0 20px;
-  background:rgba(18, 18, 22, 0.82);
-  backdrop-filter:blur(24px) saturate(180%);
-  -webkit-backdrop-filter:blur(24px) saturate(180%);
-  border-bottom:1px solid var(--border-subtle);
-  z-index:20;
-}
-.logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:600;
-  font-size:14px;
-  letter-spacing:-0.015em;
-  color:var(--text-primary);
-}
-.logo-glyph{
-  width:24px;
-  height:24px;
-  border-radius:7px;
-  background:linear-gradient(135deg, var(--sys-orange) 0%, var(--sys-purple) 60%, var(--sys-blue) 100%);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 2px 8px rgba(255, 159, 10, 0.3);
-}
-.logo-glyph svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2}
-.logo small{
-  color:var(--text-tertiary);
-  font-weight:400;
-  font-size:12px;
-  margin-left:4px;
-  letter-spacing:0;
-}
-.stats{
-  margin-left:auto;
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-.stat-pill{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:4px 10px;
-  border-radius:var(--radius-sm);
-  background:var(--bg-subtle);
-  border:1px solid var(--border-subtle);
-  font-size:11.5px;
-  color:var(--text-secondary);
-}
-.stat-pill b{
-  color:var(--text-primary);
-  font-variant-numeric:tabular-nums;
-  font-weight:600;
+/* Header Bar */
+header {
+  grid-column: 1 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  background: var(--bg-header);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 30;
 }
 
-/* Sidebar & Navigation */
-aside{
-  display:flex;
-  flex-direction:column;
-  background:rgba(20, 20, 24, 0.75);
-  backdrop-filter:blur(24px) saturate(180%);
-  -webkit-backdrop-filter:blur(24px) saturate(180%);
-  border-right:1px solid var(--border-subtle);
-  overflow:hidden;
-}
-.sidebar-header{
-  padding:14px 16px 10px;
-  border-bottom:1px solid var(--border-subtle);
-}
-.sidebar-header h3{
-  font-size:11px;
-  font-weight:600;
-  letter-spacing:0.04em;
-  text-transform:uppercase;
-  color:var(--text-tertiary);
-  margin-bottom:10px;
-}
-.search-box{
-  position:relative;
-  margin-bottom:10px;
-}
-.search-box svg{
-  position:absolute;
-  left:9px;
-  top:50%;
-  transform:translateY(-50%);
-  width:13px;
-  height:13px;
-  stroke:var(--text-tertiary);
-  fill:none;
-}
-.search-box input{
-  width:100%;
-  padding:6px 10px 6px 28px;
-  background:rgba(0, 0, 0, 0.35);
-  border:1px solid var(--border-subtle);
-  border-radius:7px;
-  color:var(--text-primary);
-  font:12px var(--font-system);
-  outline:none;
-  transition:border-color 0.15s ease;
-}
-.search-box input:focus{
-  border-color:var(--border-focus);
-}
-.search-box input::placeholder{color:var(--text-tertiary)}
-
-/* Segmented Filter Controls */
-.filter-segmented{
-  display:flex;
-  background:rgba(0, 0, 0, 0.3);
-  padding:2px;
-  border-radius:8px;
-  border:1px solid var(--border-subtle);
-  gap:2px;
-}
-.filter-btn{
-  flex:1;
-  border:none;
-  background:transparent;
-  color:var(--text-secondary);
-  font:500 11px var(--font-system);
-  padding:4px 0;
-  border-radius:6px;
-  cursor:pointer;
-  transition:all 0.12s ease;
-  text-align:center;
-}
-.filter-btn:hover{color:var(--text-primary)}
-.filter-btn.active{
-  background:rgba(255, 255, 255, 0.12);
-  color:var(--text-primary);
-  font-weight:600;
-  box-shadow:0 1px 4px rgba(0, 0, 0, 0.25);
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.case-list{
-  flex:1;
-  overflow-y:auto;
-  padding:6px 8px;
-}
-.case-item{
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  gap:2px 10px;
-  padding:9px 12px;
-  margin-bottom:3px;
-  border-radius:var(--radius-sm);
-  cursor:pointer;
-  align-items:center;
-  transition:all 0.12s ease;
-  border:1px solid transparent;
-}
-.case-item:hover{
-  background:rgba(255, 255, 255, 0.04);
-}
-.case-item.on{
-  background:rgba(10, 132, 255, 0.16);
-  border-color:rgba(10, 132, 255, 0.35);
-}
-.case-item .id{
-  font-weight:600;
-  font-size:12.5px;
-  color:var(--text-primary);
-  font-family:var(--font-mono);
-}
-.case-item .sub{
-  grid-column:2;
-  color:var(--text-tertiary);
-  font-size:11.5px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.case-item .p{
-  font-family:var(--font-mono);
-  font-variant-numeric:tabular-nums;
-  font-size:12px;
-  font-weight:600;
-  color:var(--text-secondary);
-  text-align:right;
-}
-.case-item.on .id{color:#fff}
-.case-item.on .sub{color:rgba(255, 255, 255, 0.75)}
-.case-item.on .p{color:var(--text-primary)}
-
-/* Apple Status Indicators */
-.dot{
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  background:var(--text-tertiary);
-  grid-row:1/3;
-  box-shadow:0 0 0 1px rgba(0, 0, 0, 0.4);
-}
-.dot.fraud{background:var(--sys-red);box-shadow:0 0 6px rgba(255, 69, 58, 0.45)}
-.dot.legitimate{background:var(--sys-green);box-shadow:0 0 6px rgba(48, 209, 88, 0.4)}
-.dot.uncertain{background:var(--sys-orange);box-shadow:0 0 6px rgba(255, 159, 10, 0.4)}
-
-/* Main Content Workspace */
-main{
-  overflow-y:auto;
-  padding:24px 32px 64px;
-  background:radial-gradient(ellipse at 50% 0%, rgba(20, 26, 38, 0.4) 0%, transparent 70%);
-}
-.empty-state{
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  color:var(--text-secondary);
-}
-.empty-icon{
-  width:56px;
-  height:56px;
-  border-radius:16px;
-  background:var(--bg-subtle);
-  border:1px solid var(--border-subtle);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin-bottom:16px;
-}
-.empty-icon svg{width:28px;height:28px;stroke:var(--text-tertiary);fill:none;stroke-width:1.75}
-.empty-state h2{
-  color:var(--text-primary);
-  font-size:18px;
-  font-weight:600;
-  margin-bottom:8px;
-}
-.empty-state p{
-  color:var(--text-secondary);
-  font-size:13px;
-  max-width:380px;
-  line-height:1.5;
+.brand-glyph {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, rgba(62, 207, 142, 0.25) 0%, rgba(62, 207, 142, 0.05) 100%);
+  border: 1px solid var(--sb-brand-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Detail Case Header */
-.case-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:20px;
-  flex-wrap:wrap;
-  margin-bottom:20px;
-}
-.case-title-area{flex:1;min-width:320px}
-.case-heading{
-  font-size:22px;
-  font-weight:700;
-  letter-spacing:-0.02em;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:6px;
-}
-.case-heading .cid-label{font-family:var(--font-mono)}
-.trigger-desc{
-  font-size:13px;
-  color:var(--text-secondary);
-  line-height:1.5;
-  max-width:820px;
-}
-.case-meta{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:8px;
-  font-size:11.5px;
-  color:var(--text-tertiary);
-}
-.case-meta span{display:inline-flex;align-items:center;gap:4px}
-.case-meta .bullet{opacity:0.4}
-
-/* Apple HIG Chips */
-.chip{
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  padding:3px 9px;
-  border-radius:var(--radius-pill);
-  font-size:11px;
-  font-weight:600;
-  letter-spacing:0.01em;
-  border:1px solid var(--border-subtle);
-  background:rgba(255, 255, 255, 0.06);
-  color:var(--text-secondary);
-  text-transform:capitalize;
-}
-.chip.fraud{
-  background:rgba(255, 69, 58, 0.15);
-  border-color:rgba(255, 69, 58, 0.3);
-  color:#ff6961;
-}
-.chip.legitimate{
-  background:rgba(48, 209, 88, 0.15);
-  border-color:rgba(48, 209, 88, 0.3);
-  color:#42d869;
-}
-.chip.uncertain{
-  background:rgba(255, 159, 10, 0.15);
-  border-color:rgba(255, 159, 10, 0.3);
-  color:#ffaa2c;
-}
-.chip.auto{color:var(--sys-green);background:rgba(48,209,88,0.1)}
-.chip.L1{color:var(--sys-orange);background:rgba(255,159,10,0.1)}
-.chip.L2{color:var(--sys-red);background:rgba(255,69,58,0.1)}
-
-/* Apple System Action Buttons */
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  background:var(--sys-blue);
-  color:#ffffff;
-  border:1px solid rgba(255, 255, 255, 0.12);
-  border-radius:9px;
-  padding:8px 16px;
-  font:600 13px var(--font-system);
-  cursor:pointer;
-  transition:all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow:0 1px 3px rgba(0, 0, 0, 0.3);
-}
-.btn:hover{
-  background:#1a8cff;
-  transform:translateY(-0.5px);
-  box-shadow:0 4px 12px rgba(10, 132, 255, 0.35);
-}
-.btn:active{
-  transform:scale(0.98);
-}
-.btn:disabled{
-  opacity:0.55;
-  cursor:wait;
-  transform:none;
-}
-.btn.ghost{
-  background:rgba(255, 255, 255, 0.08);
-  color:var(--text-primary);
-  border:1px solid var(--border-subtle);
-}
-.btn.ghost:hover{
-  background:rgba(255, 255, 255, 0.12);
-  border-color:var(--border-hover);
+.brand-glyph svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--sb-brand);
+  fill: none;
+  stroke-width: 2;
 }
 
-/* KPI Cards Row */
-.kpis{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:12px;
-  margin-bottom:20px;
-}
-.kpi{
-  background:var(--bg-card);
-  backdrop-filter:blur(16px);
-  border:1px solid var(--border-subtle);
-  border-radius:var(--radius-md);
-  padding:12px 14px;
-  transition:border-color 0.15s ease;
-}
-.kpi:hover{border-color:var(--border-hover)}
-.kpi label{
-  display:block;
-  font-size:10.5px;
-  font-weight:600;
-  letter-spacing:0.04em;
-  text-transform:uppercase;
-  color:var(--text-tertiary);
-  margin-bottom:4px;
-}
-.kpi b{
-  font-size:18px;
-  font-weight:600;
-  color:var(--text-primary);
-  font-variant-numeric:tabular-nums;
-  font-family:var(--font-mono);
+.brand-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
 }
 
-/* Grid Layout */
-.detail-grid{
-  display:grid;
-  grid-template-columns:minmax(0, 1.15fr) minmax(0, 1fr);
-  gap:16px;
-}
-@media(max-width:1250px){
-  .detail-grid{grid-template-columns:1fr}
-  .app{grid-template-columns:280px 1fr}
-}
-
-/* Card Surface */
-.card{
-  background:var(--bg-card);
-  backdrop-filter:blur(16px);
-  border:1px solid var(--border-subtle);
-  border-radius:var(--radius-lg);
-  padding:16px 18px;
-  margin-bottom:16px;
-  box-shadow:var(--glass-shadow);
-}
-.card h2{
-  margin:0 0 14px;
-  font-size:11.5px;
-  font-weight:600;
-  letter-spacing:0.04em;
-  text-transform:uppercase;
-  color:var(--text-secondary);
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.card h2 em{
-  font-style:normal;
-  font-weight:400;
-  color:var(--text-tertiary);
-  text-transform:none;
-  letter-spacing:0;
-  font-size:11.5px;
-  margin-left:auto;
+.brand-pill {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--sb-brand);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: var(--sb-brand-subtle);
+  border: 1px solid var(--sb-brand-border);
 }
 
-/* Apple HIG Uncertainty Gauge */
-.gauge-wrapper{margin:18px 0 24px}
-.gauge{
-  position:relative;
-  height:12px;
-  border-radius:6px;
-  background:linear-gradient(90deg, #18442e 0%, #294025 20%, #4a3c1a 45%, #592e22 75%, #661f28 100%);
-  border:1px solid rgba(255, 255, 255, 0.08);
+.telemetry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.gauge .mk{
-  position:absolute;
-  top:-5px;
-  width:4px;
-  height:22px;
-  background:#ffffff;
-  border-radius:2px;
-  box-shadow:0 0 8px rgba(255, 255, 255, 0.7);
-  transition:left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+.telemetry-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  font-size: 11.5px;
+  color: var(--text-secondary);
 }
-.gauge .mk span{
-  position:absolute;
-  top:-22px;
-  left:50%;
-  transform:translateX(-50%);
-  font-weight:700;
-  font-size:11.5px;
-  font-family:var(--font-mono);
-  font-variant-numeric:tabular-nums;
-  background:rgba(255, 255, 255, 0.15);
-  padding:1px 6px;
-  border-radius:4px;
-  backdrop-filter:blur(4px);
+
+.telemetry-item svg {
+  width: 12px;
+  height: 12px;
+  stroke: var(--text-tertiary);
+  fill: none;
+  stroke-width: 1.75;
 }
-.gauge-ticks{
-  position:relative;
-  height:16px;
-  margin-top:6px;
+
+.telemetry-item b {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
-.gauge-ticks .tk{
-  position:absolute;
-  font-size:10px;
-  font-family:var(--font-mono);
-  color:var(--text-tertiary);
-  transform:translateX(-50%);
+
+/* Sidebar Navigation */
+aside {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-sidebar);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border-right: 1px solid var(--border-subtle);
+  overflow: hidden;
 }
-.gauge-labels{
-  display:flex;
-  justify-content:space-between;
-  color:var(--text-tertiary);
-  font-size:11px;
-  font-weight:500;
-  margin-top:4px;
+
+.sidebar-top {
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.sidebar-count-badge {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  background: var(--bg-subtle);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.search-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-field svg.icon-search {
+  position: absolute;
+  left: 9px;
+  width: 13px;
+  height: 13px;
+  stroke: var(--text-tertiary);
+  fill: none;
+  stroke-width: 1.75;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 6px 28px 6px 28px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font: 12px var(--font-system);
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.search-input:focus {
+  border-color: var(--border-focus);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.search-clear {
+  position: absolute;
+  right: 7px;
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color 0.1s ease;
+}
+
+.search-clear:hover {
+  color: var(--text-primary);
+}
+
+.search-clear svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+/* Filter Segmented Control */
+.segmented-control {
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  gap: 2px;
+}
+
+.segment-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font: 500 11px var(--font-system);
+  padding: 4px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s var(--ease-spring), color 0.12s ease;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.segment-btn:hover {
+  color: var(--text-primary);
+}
+
+.segment-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.segment-pill {
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+  padding: 0 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+.segment-btn.active .segment-pill {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+}
+
+/* Sidebar Alert List */
+.case-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 8px;
+}
+
+.case-item {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  row-gap: 2px;
+  padding: 9px 11px;
+  margin-bottom: 2px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  align-items: center;
+  transition: background 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+  border: 1px solid transparent;
+  outline: none;
+}
+
+.case-item:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.case-item:focus-visible {
+  border-color: var(--border-focus);
+}
+
+.case-item:active {
+  transform: scale(0.985);
+}
+
+.case-item.on {
+  background: rgba(62, 207, 142, 0.12);
+  border-color: var(--sb-brand-border);
+}
+
+/* Status Indicators */
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  grid-row: 1 / 3;
+}
+
+.status-dot.fraud {
+  background: var(--sb-red);
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+}
+
+.status-dot.legitimate {
+  background: var(--sb-brand);
+  box-shadow: 0 0 6px rgba(62, 207, 142, 0.45);
+}
+
+.status-dot.uncertain {
+  background: var(--sb-amber);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.45);
+}
+
+.case-id-text {
+  font-weight: 600;
+  font-size: 12.5px;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  grid-column: 2;
+}
+
+.case-prob-text {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: right;
+  grid-column: 3;
+}
+
+.case-meta-sub {
+  grid-column: 2 / 4;
+  color: var(--text-tertiary);
+  font-size: 11.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.case-item.on .case-id-text { color: #ffffff; }
+.case-item.on .case-meta-sub { color: rgba(255, 255, 255, 0.75); }
+.case-item.on .case-prob-text { color: var(--sb-brand); }
+
+/* Main Workspace */
+main {
+  overflow-y: auto;
+  padding: 22px 28px 48px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(62, 207, 142, 0.08) 0%, transparent 60%), var(--bg-system);
+}
+
+/* Empty State */
+.empty-state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.empty-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.empty-icon-box svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--text-tertiary);
+  fill: none;
+  stroke-width: 1.75;
+}
+
+.empty-state h2 {
+  color: var(--text-primary);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-bottom: 6px;
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  max-width: 360px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.keyboard-hints {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.hint-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.hint-chip kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+/* Case Detail Top Bar */
+.case-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.case-info {
+  flex: 1;
+  min-width: 300px;
+}
+
+.case-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+
+.case-cid {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.case-chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Supabase Styled Chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.chip.fraud {
+  background: var(--sb-red-subtle);
+  border-color: var(--sb-red-border);
+  color: #f87171;
+}
+
+.chip.legitimate {
+  background: var(--sb-brand-subtle);
+  border-color: var(--sb-brand-border);
+  color: var(--sb-brand);
+}
+
+.chip.uncertain {
+  background: var(--sb-amber-subtle);
+  border-color: var(--sb-amber-border);
+  color: #fbbf24;
+}
+
+.chip.route-auto {
+  background: var(--sb-brand-subtle);
+  border-color: var(--sb-brand-border);
+  color: var(--sb-brand);
+}
+
+.chip.route-L1 {
+  background: var(--sb-amber-subtle);
+  border-color: var(--sb-amber-border);
+  color: #fbbf24;
+}
+
+.chip.route-L2 {
+  background: var(--sb-red-subtle);
+  border-color: var(--sb-red-border);
+  color: #f87171;
+}
+
+.trigger-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  max-width: 800px;
+  margin-bottom: 6px;
+}
+
+.case-meta-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+}
+
+.case-meta-line .sep { opacity: 0.35; }
+.case-meta-line b { font-family: var(--font-mono); color: var(--text-secondary); font-weight: 500; }
+
+/* Action Buttons */
+.case-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--sb-brand);
+  color: #121212;
+  border: 1px solid var(--sb-brand);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font: 600 12.5px var(--font-system);
+  cursor: pointer;
+  transition: transform 0.12s var(--ease-spring), background 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 3px rgba(62, 207, 142, 0.25);
+}
+
+.btn:hover {
+  background: var(--sb-brand-hover);
+  transform: translateY(-0.5px);
+  box-shadow: 0 4px 12px rgba(62, 207, 142, 0.35);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: wait;
+  transform: none;
+}
+
+.btn svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+
+.btn.ghost {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  box-shadow: none;
+}
+
+.btn.ghost:hover {
+  background: var(--bg-subtle-hover);
+  border-color: var(--border-hover);
+}
+
+/* KPI Summary Cards */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 11px 13px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.kpi-card:hover {
+  border-color: var(--border-hover);
+}
+
+.kpi-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+.kpi-val {
+  font-size: 17px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+/* Main Grid Layout */
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+@media(max-width: 1200px) {
+  .detail-grid { grid-template-columns: 1fr; }
+  .app { grid-template-columns: 280px 1fr; }
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 15px 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-glass);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-title svg {
+  width: 13px;
+  height: 13px;
+  stroke: var(--text-tertiary);
+  fill: none;
+  stroke-width: 1.75;
+}
+
+.card-subtitle {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+}
+
+/* Calibrated Gauge */
+.gauge-container {
+  margin: 14px 0 20px;
+}
+
+.gauge-track {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #103525 0%, #1e452a 20%, #443a18 45%, #4d221c 75%, #5c1d1a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gauge-pointer {
+  position: absolute;
+  top: -4px;
+  width: 3px;
+  height: 18px;
+  background: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+  transition: left 0.4s var(--ease-spring);
+}
+
+.gauge-badge {
+  position: absolute;
+  top: -21px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 700;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 1px 5px;
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+}
+
+.gauge-markers {
+  position: relative;
+  height: 14px;
+  margin-top: 5px;
+}
+
+.gauge-marker {
+  position: absolute;
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  transform: translateX(-50%);
+}
+
+.gauge-regions {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-tertiary);
+  font-size: 10.5px;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* Callout Box */
+.callout {
+  margin-top: 10px;
+  padding: 9px 12px;
+  border-left: 3px solid var(--sb-amber);
+  background: var(--sb-amber-subtle);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: #fef3c7;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.callout.success {
+  border-color: var(--sb-brand);
+  background: var(--sb-brand-subtle);
+  color: #d1fae5;
+}
+
+/* Policy Action Items */
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media(max-width: 800px) { .action-grid { grid-template-columns: 1fr; } }
+
+.action-column h4 {
+  font-size: 10.5px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.action-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  background: var(--bg-subtle);
+}
+
+.action-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-item-header b {
+  font: 600 11.5px var(--font-mono);
+  color: var(--text-primary);
+}
+
+.action-item p {
+  margin: 3px 0 0;
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  line-height: 1.4;
 }
 
 /* Timeline & Steps */
-.tl{
-  position:relative;
-  margin-left:6px;
-  padding-left:14px;
-  border-left:1.5px solid var(--border-subtle);
-}
-.st{
-  position:relative;
-  padding:0 0 16px 20px;
-  animation:stepIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes stepIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.st .n{
-  position:absolute;
-  left:-21.5px;
-  top:1px;
-  width:16px;
-  height:16px;
-  border-radius:50%;
-  background:var(--bg-system);
-  border:2px solid var(--sys-blue);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:9.5px;
-  font-weight:700;
-  color:var(--sys-blue);
-}
-.st.evidence .n{border-color:var(--sys-purple);color:var(--sys-purple)}
-.st.recommend .n{border-color:var(--sys-green);color:var(--sys-green)}
-.st.stop .n{border-color:var(--sys-red);color:var(--sys-red)}
-.st.memory .n,.st.memory_write .n{border-color:var(--sys-teal);color:var(--sys-teal)}
-.st b{
-  display:block;
-  font-size:13px;
-  font-weight:600;
-  color:var(--text-primary);
-}
-.st p{
-  margin:3px 0 0;
-  color:var(--text-secondary);
-  font-size:12px;
-  line-height:1.45;
-}
-.st .tm{
-  float:right;
-  color:var(--text-tertiary);
-  font:11px var(--font-mono);
+.timeline {
+  position: relative;
+  margin-left: 6px;
+  padding-left: 12px;
+  border-left: 1.5px solid var(--border-subtle);
 }
 
-/* Next Best Action Cards */
-.acts{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-@media(max-width:900px){.acts{grid-template-columns:1fr}}
-.acts h4{
-  margin:0 0 8px;
-  font-size:11px;
-  color:var(--text-tertiary);
-  font-weight:600;
-  letter-spacing:0.04em;
-  text-transform:uppercase;
-}
-.act{
-  border:1px solid var(--border-subtle);
-  border-radius:var(--radius-sm);
-  padding:9px 11px;
-  margin-bottom:8px;
-  background:rgba(255, 255, 255, 0.03);
-}
-.act .h{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-}
-.act .h b{font:600 12px var(--font-mono);color:var(--text-primary)}
-.act p{margin:4px 0 0;color:var(--text-secondary);font-size:11.5px;line-height:1.4}
-.callout{
-  margin-top:10px;
-  padding:10px 12px;
-  border-left:3px solid var(--sys-orange);
-  background:rgba(255, 159, 10, 0.08);
-  border-radius:0 8px 8px 0;
-  color:#f2dfc4;
-  font-size:12.5px;
-  line-height:1.45;
-}
-.callout.success{
-  border-color:var(--sys-green);
-  background:rgba(48, 209, 88, 0.08);
-  color:#d4f3e2;
+.timeline-step {
+  position: relative;
+  padding: 0 0 14px 18px;
+  animation: stepEntrance 0.25s var(--ease-spring);
 }
 
-/* Evidence Row */
-.ev{
-  display:grid;
-  grid-template-columns:auto 1fr;
-  gap:4px 12px;
-  padding:10px 0;
-  border-bottom:1px solid var(--border-subtle);
-}
-.ev:last-child{border:0}
-.src{
-  font:600 10px var(--font-mono);
-  padding:2px 7px;
-  border-radius:5px;
-  height:fit-content;
-  text-transform:uppercase;
-  background:rgba(10, 132, 255, 0.15);
-  color:var(--sys-blue);
-  border:1px solid rgba(10, 132, 255, 0.25);
-}
-.src.document{background:rgba(191, 90, 242, 0.15);color:var(--sys-purple);border-color:rgba(191,90,242,0.25)}
-.src.customer{background:rgba(255, 159, 10, 0.15);color:var(--sys-orange);border-color:rgba(255,159,10,0.25)}
-.src.external{background:rgba(48, 209, 88, 0.15);color:var(--sys-green);border-color:rgba(48,209,88,0.25)}
-.ev .claim{font-size:12.5px;color:var(--text-primary);line-height:1.4}
-.ev .ref{grid-column:2;font:11px var(--font-mono);color:var(--text-tertiary);word-break:break-all;margin-top:2px}
-.ev .ids{grid-column:2;display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
-.ids span{
-  font:10px var(--font-mono);
-  background:rgba(255, 255, 255, 0.05);
-  border:1px solid var(--border-subtle);
-  padding:2px 6px;
-  border-radius:4px;
-  color:var(--text-secondary);
+@keyframes stepEntrance {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* SAR Report Presentation */
-.sar-box{position:relative}
-pre.sar{
-  white-space:pre-wrap;
-  font:12.5px/1.6 var(--font-mono);
-  color:#e4e9f5;
-  margin:0;
-  background:rgba(0, 0, 0, 0.45);
-  border:1px solid var(--border-subtle);
-  border-radius:var(--radius-sm);
-  padding:14px 16px;
+.step-badge {
+  position: absolute;
+  left: -19.5px;
+  top: 1px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--bg-system);
+  border: 2px solid var(--sb-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--sb-blue);
 }
-.sar-copy-btn{
-  position:absolute;
-  top:8px;
-  right:8px;
-  background:rgba(255, 255, 255, 0.1);
-  border:1px solid var(--border-subtle);
-  color:var(--text-secondary);
-  font:500 11px var(--font-system);
-  padding:4px 8px;
-  border-radius:6px;
-  cursor:pointer;
-  transition:all 0.15s ease;
-}
-.sar-copy-btn:hover{background:rgba(255,255,255,0.18);color:#fff}
 
-/* Case Memory Row */
-.mem{
-  display:grid;
-  grid-template-columns:auto 1fr;
-  gap:2px 10px;
-  padding:8px 0;
-  border-bottom:1px solid var(--border-subtle);
-  font-size:12px;
+.timeline-step.evidence .step-badge { border-color: var(--sb-purple); color: var(--sb-purple); }
+.timeline-step.recommend .step-badge { border-color: var(--sb-brand); color: var(--sb-brand); }
+.timeline-step.stop .step-badge { border-color: var(--sb-red); color: var(--sb-red); }
+.timeline-step.memory .step-badge, .timeline-step.memory_write .step-badge { border-color: var(--sb-brand); color: var(--sb-brand); }
+
+.step-title {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
-.mem:last-child{border:0}
-.mem .cid{font:600 12px var(--font-mono);color:var(--sys-blue)}
+
+.step-detail {
+  margin: 2px 0 0;
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
+.step-time {
+  float: right;
+  color: var(--text-tertiary);
+  font: 10.5px var(--font-mono);
+}
+
+/* Evidence Rows */
+.evidence-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.evidence-row:last-child { border: 0; }
+
+.source-badge {
+  font: 600 9.5px var(--font-mono);
+  padding: 2px 6px;
+  border-radius: 4px;
+  height: fit-content;
+  text-transform: uppercase;
+  background: var(--sb-blue-subtle);
+  color: var(--sb-blue);
+  border: 1px solid var(--sb-blue-border);
+}
+
+.source-badge.document { background: var(--sb-purple-subtle); color: var(--sb-purple); border-color: var(--sb-purple-border); }
+.source-badge.customer { background: var(--sb-amber-subtle); color: var(--sb-amber); border-color: var(--sb-amber-border); }
+.source-badge.external { background: var(--sb-brand-subtle); color: var(--sb-brand); border-color: var(--sb-brand-border); }
+
+.evidence-claim {
+  font-size: 12px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.evidence-ref {
+  grid-column: 2;
+  font: 10.5px var(--font-mono);
+  color: var(--text-tertiary);
+  word-break: break-all;
+  margin-top: 2px;
+}
+
+.evidence-tags {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.evidence-tag {
+  font: 10px var(--font-mono);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+}
+
+/* SAR Box */
+.sar-box { position: relative; }
+
+pre.sar-text {
+  white-space: pre-wrap;
+  font: 12px/1.55 var(--font-mono);
+  color: #e4e4e7;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+
+.sar-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font: 500 11px var(--font-system);
+  padding: 3px 7px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.sar-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
 
 /* Reasoning List */
-ul.rs{margin:0;padding-left:18px;color:var(--text-secondary)}
-ul.rs li{margin:5px 0;font-size:12.5px;line-height:1.45}
+ul.reasoning-list {
+  margin: 0;
+  padding-left: 16px;
+  color: var(--text-secondary);
+}
+
+ul.reasoning-list li {
+  margin: 4px 0;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* Memory Rows */
+.memory-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 11.5px;
+}
+
+.memory-row:last-child { border: 0; }
+.memory-cid { font: 600 11.5px var(--font-mono); color: var(--sb-brand); }
 
 /* Activity Spinner */
-.spin{
-  display:inline-block;
-  width:13px;
-  height:13px;
-  border:2px solid rgba(255, 255, 255, 0.25);
-  border-top-color:#ffffff;
-  border-radius:50%;
-  animation:sp 0.65s linear infinite;
-  vertical-align:-2px;
-  margin-right:6px;
+.spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(18, 18, 18, 0.3);
+  border-top-color: #121212;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  vertical-align: -1px;
 }
-@keyframes sp{to{transform:rotate(360deg)}}
 
-/* Custom Apple HIG Scrollbars */
-::-webkit-scrollbar{width:7px;height:7px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(255, 255, 255, 0.12);border-radius:4px}
-::-webkit-scrollbar-thumb:hover{background:rgba(255, 255, 255, 0.25)}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(24, 24, 27, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-hover);
+  color: var(--text-primary);
+  font: 500 12px var(--font-system);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-glass);
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s var(--ease-spring), transform 0.2s var(--ease-spring);
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
 </style>
 </head>
 <body>
 <div class="app">
   <header>
-    <div class="logo">
-      <div class="logo-glyph">
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    <div class="brand">
+      <div class="brand-glyph">
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       </div>
-      <span>FraudGraph Agent</span>
-      <small>TigerGraph · GraphRAG · Policy Engine</small>
+      <div class="brand-title">
+        <span>FraudGraph Agent</span>
+        <span class="brand-pill">TigerGraph Engine</span>
+      </div>
     </div>
-    <div class="stats" id="stats"></div>
+    <div class="telemetry" id="stats"></div>
   </header>
 
   <aside>
-    <div class="sidebar-header">
-      <h3>Alert Queue</h3>
-      <div class="search-box">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input type="text" id="search" placeholder="Search case or card ID…" oninput="filterCases()">
+    <div class="sidebar-top">
+      <div class="sidebar-title-row">
+        <span class="sidebar-title">Alert Queue</span>
+        <span class="sidebar-count-badge" id="queue-count">0</span>
       </div>
-      <div class="filter-segmented">
-        <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
-        <button class="filter-btn" data-filter="fraud" onclick="setFilter('fraud')">Fraud</button>
-        <button class="filter-btn" data-filter="uncertain" onclick="setFilter('uncertain')">Uncertain</button>
-        <button class="filter-btn" data-filter="legitimate" onclick="setFilter('legitimate')">Legit</button>
+      <div class="search-field">
+        <svg class="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="search" class="search-input" placeholder="Search case or card ID (/)" oninput="handleSearch()">
+        <button class="search-clear" id="search-clear" onclick="clearSearch()" title="Clear search">
+          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="segmented-control">
+        <button class="segment-btn active" data-filter="all" onclick="setFilter('all')">
+          <span>All</span>
+          <span class="segment-pill" id="count-all">0</span>
+        </button>
+        <button class="segment-btn" data-filter="fraud" onclick="setFilter('fraud')">
+          <span>Fraud</span>
+          <span class="segment-pill" id="count-fraud">0</span>
+        </button>
+        <button class="segment-btn" data-filter="uncertain" onclick="setFilter('uncertain')">
+          <span>Uncertain</span>
+          <span class="segment-pill" id="count-uncertain">0</span>
+        </button>
+        <button class="segment-btn" data-filter="legitimate" onclick="setFilter('legitimate')">
+          <span>Legit</span>
+          <span class="segment-pill" id="count-legit">0</span>
+        </button>
       </div>
     </div>
-    <div class="case-list" id="list"></div>
+    <div class="case-list" id="list" role="listbox" aria-label="Alert cases list"></div>
   </aside>
 
   <main id="main">
     <div class="empty-state">
-      <div class="empty-icon">
+      <div class="empty-icon-box">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 9h6M15 15h6"/></svg>
       </div>
       <h2>Select an Alert to Investigate</h2>
-      <p>The agent investigates alerts across the TigerGraph knowledge graph, runs calibrated fraud models, evaluates deterministic policy rules, and records verified memory back to the graph.</p>
+      <p>Investigate flagged transactions with TigerGraph GraphRAG, calibrated ML scoring, deterministic policy rules, and graph memory.</p>
+      <div class="keyboard-hints">
+        <span class="hint-chip"><kbd>&uarr;</kbd> <kbd>&darr;</kbd> Navigate</span>
+        <span class="hint-chip"><kbd>/</kbd> Search</span>
+        <span class="hint-chip"><kbd>&crarr;</kbd> Select</span>
+      </div>
     </div>
   </main>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const money = n => "$" + Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-const pretty = s => String(s||"").replaceAll("_"," ");
+const money = n => "$" + Number(n||0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const pretty = s => String(s||"").replaceAll("_", " ");
+
 let CASES = [], CUR = null, CURRENT_FILTER = "all", SEARCH_QUERY = "";
 
-async function boot(){
-  try{
+function showToast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+async function boot() {
+  try {
     CASES = await (await fetch("/api/cases")).json();
+    updateFilterCounts();
     renderList();
     const s = await (await fetch("/api/stats")).json();
     $("#stats").innerHTML = `
-      <div class="stat-pill"><span>Txns</span><b>${(s.transactions||0).toLocaleString()}</b></div>
-      <div class="stat-pill"><span>Cards</span><b>${(s.cards||0).toLocaleString()}</b></div>
-      <div class="stat-pill"><span>Closed Cases</span><b>${(s.closed_cases||0).toLocaleString()}</b></div>
-      <div class="stat-pill"><span>Agent Cases</span><b>${s.agent_cases||0}</b></div>
-      <div class="stat-pill"><span>Avg Latency</span><b>${s.avg_latency||0}s</b></div>`;
-  }catch(e){
+      <div class="telemetry-item">
+        <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        <span>Txns</span><b>${(s.transactions||0).toLocaleString()}</b>
+      </div>
+      <div class="telemetry-item">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        <span>Cards</span><b>${(s.cards||0).toLocaleString()}</b>
+      </div>
+      <div class="telemetry-item">
+        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+        <span>Closed</span><b>${(s.closed_cases||0).toLocaleString()}</b>
+      </div>
+      <div class="telemetry-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span>Memory</span><b>${s.agent_cases||0}</b>
+      </div>
+      <div class="telemetry-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Latency</span><b>${s.avg_latency||0}s</b>
+      </div>`;
+  } catch (e) {
     console.error("Boot error:", e);
   }
   const h = location.hash.slice(1);
   if (h) openCase(h);
 }
 
-function setFilter(filter){
+function updateFilterCounts() {
+  $("#count-all").textContent = CASES.length;
+  $("#count-fraud").textContent = CASES.filter(c => c.verdict === "fraud").length;
+  $("#count-uncertain").textContent = CASES.filter(c => c.verdict === "uncertain" || !c.verdict).length;
+  $("#count-legit").textContent = CASES.filter(c => c.verdict === "legitimate").length;
+}
+
+function setFilter(filter) {
   CURRENT_FILTER = filter;
-  document.querySelectorAll(".filter-btn").forEach(b => {
+  document.querySelectorAll(".segment-btn").forEach(b => {
     b.classList.toggle("active", b.dataset.filter === filter);
   });
   renderList();
 }
 
-function filterCases(){
+function handleSearch() {
   SEARCH_QUERY = ($("#search").value || "").trim().toLowerCase();
+  $("#search-clear").style.display = SEARCH_QUERY ? "flex" : "none";
   renderList();
 }
 
-function renderList(){
-  const filtered = CASES.filter(c => {
-    if (CURRENT_FILTER !== "all" && (c.verdict || "uncertain") !== CURRENT_FILTER) return false;
-    if (SEARCH_QUERY){
+function clearSearch() {
+  $("#search").value = "";
+  handleSearch();
+  $("#search").focus();
+}
+
+function getFilteredCases() {
+  return CASES.filter(c => {
+    const verdict = c.verdict || "uncertain";
+    if (CURRENT_FILTER !== "all" && verdict !== CURRENT_FILTER) return false;
+    if (SEARCH_QUERY) {
       const matchId = (c.case_id || "").toLowerCase().includes(SEARCH_QUERY);
       const matchCard = (c.card_id || "").toLowerCase().includes(SEARCH_QUERY);
       const matchPattern = (c.pattern || "").toLowerCase().includes(SEARCH_QUERY);
@@ -841,224 +1284,289 @@ function renderList(){
     }
     return true;
   });
+}
+
+function renderList() {
+  const filtered = getFilteredCases();
+  $("#queue-count").textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    $("#list").innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-tertiary);font-size:12px;">No matching alerts found</div>`;
+    return;
+  }
 
   $("#list").innerHTML = filtered.map(c => `
-    <div class="case-item ${CUR===c.case_id?"on":""}" onclick="openCase('${c.case_id}')" role="button" tabindex="0">
-      <span class="dot ${c.verdict||""}"></span>
-      <span class="id">${c.case_id}</span>
-      <span class="p">${c.probability!=null?(c.probability*100).toFixed(0)+"%":"—"}</span>
-      <span class="sub">${pretty(c.trigger_type)} · ${esc(c.card_id)}${c.pattern&&c.pattern!="none"?" · "+pretty(c.pattern):""}</span>
+    <div class="case-item ${CUR === c.case_id ? "on" : ""}"
+         onclick="openCase('${c.case_id}')"
+         role="option"
+         aria-selected="${CUR === c.case_id}"
+         tabindex="0"
+         data-id="${c.case_id}">
+      <span class="status-dot ${c.verdict || ""}"></span>
+      <span class="case-id-text">${c.case_id}</span>
+      <span class="case-prob-text">${c.probability != null ? (c.probability * 100).toFixed(0) + "%" : "-"}</span>
+      <span class="case-meta-sub">${pretty(c.trigger_type)} &middot; ${esc(c.card_id)}${c.pattern && c.pattern !== "none" ? " &middot; " + pretty(c.pattern) : ""}</span>
     </div>`).join("");
 }
 
-async function openCase(id){
+async function openCase(id) {
   CUR = id;
   location.hash = id;
   renderList();
   const meta = CASES.find(c => c.case_id === id);
   if (!meta) return;
-  const r = await fetch("/api/cases/" + id);
-  if (r.ok) view(meta, await r.json());
-  else shell(meta);
+  try {
+    const r = await fetch("/api/cases/" + id);
+    if (r.ok) view(meta, await r.json());
+    else shell(meta);
+  } catch (e) {
+    shell(meta);
+  }
 }
 
-function shell(meta){
+function shell(meta) {
   $("#main").innerHTML = header(meta) + `
     <div class="card">
-      <h2>Investigation Timeline <em id="live">ready to execute</em></h2>
-      <div class="tl" id="tl"></div>
+      <div class="card-header">
+        <span class="card-title">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Investigation Trace
+        </span>
+        <span class="card-subtitle" id="live">Ready for execution</span>
+      </div>
+      <div class="timeline" id="tl"></div>
     </div>`;
   $("#run").onclick = () => run(meta);
 }
 
-function header(meta, a){
+function header(meta, a) {
   const c = a && a.case;
   return `
-    <div class="case-top">
-      <div class="case-title-area">
-        <div class="case-heading">
-          <span class="cid-label">${meta.case_id}</span>
+    <div class="case-top-bar">
+      <div class="case-info">
+        <div class="case-title-row">
+          <span class="case-cid">${meta.case_id}</span>
           ${c ? `
-            <span class="chip ${c.verdict}">${c.verdict}</span>
-            <span class="chip">${pretty(c.status)}</span>
-            <span class="chip">${pretty(c.pattern)}</span>
+            <div class="case-chips">
+              <span class="chip ${c.verdict}">${c.verdict}</span>
+              <span class="chip">${pretty(c.status)}</span>
+              ${c.pattern && c.pattern !== "none" ? `<span class="chip">${pretty(c.pattern)}</span>` : ""}
+            </div>
           ` : ""}
         </div>
-        <div class="trigger-desc">${esc(meta.trigger_text)}</div>
-        <div class="case-meta">
+        <div class="trigger-text">${esc(meta.trigger_text)}</div>
+        <div class="case-meta-line">
           <span>${pretty(meta.trigger_type)}</span>
-          <span class="bullet">·</span>
-          <span>Opened ${esc(meta.opened_at)}</span>
-          <span class="bullet">·</span>
-          <span>Flagged Txn <b style="font-family:var(--font-mono)">${meta.flagged_txn_id}</b></span>
-          <span class="bullet">·</span>
-          <span>Card <b style="font-family:var(--font-mono)">${esc(meta.card_id)}</b></span>
-          ${meta.risk_score != null ? `<span class="bullet">·</span><span>Bank Risk Score: <b>${meta.risk_score}</b></span>` : ""}
+          <span class="sep">&middot;</span>
+          <span>Opened <b>${esc(meta.opened_at)}</b></span>
+          <span class="sep">&middot;</span>
+          <span>Flagged Txn <b>${meta.flagged_txn_id}</b></span>
+          <span class="sep">&middot;</span>
+          <span>Card <b>${esc(meta.card_id)}</b></span>
+          ${meta.risk_score != null ? `<span class="sep">&middot;</span><span>Bank Risk <b>${meta.risk_score}</b></span>` : ""}
         </div>
       </div>
-      <button class="btn" id="run">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        ${a ? "Re-run Investigation" : "Run Investigation"}
-      </button>
+      <div class="case-actions">
+        ${a ? `
+          <button class="btn ghost" onclick="copyCaseJson('${meta.case_id}')" title="Copy case JSON payload">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy JSON
+          </button>
+        ` : ""}
+        <button class="btn" id="run">
+          <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          ${a ? "Re-run Investigation" : "Run Investigation"}
+        </button>
+      </div>
     </div>`;
 }
 
-function gauge(p){
-  const tk = [[15,".15"],[30,".30"],[70,".70"],[85,".85"]].map(([l,t])=>`<span class="tk" style="left:${l}%">${t}</span>`).join("");
+function gauge(p) {
+  const ticks = [[15, ".15"], [30, ".30"], [70, ".70"], [85, ".85"]].map(([l, t]) =>
+    `<span class="gauge-marker" style="left:${l}%">${t}</span>`
+  ).join("");
   return `
-    <div class="gauge-wrapper">
-      <div class="gauge">
-        <div class="mk" style="left:${Math.max(1,Math.min(99,p*100))}%"><span>${p.toFixed(2)}</span></div>
+    <div class="gauge-container">
+      <div class="gauge-track">
+        <div class="gauge-pointer" style="left:${Math.max(1, Math.min(99, p * 100))}%">
+          <span class="gauge-badge">${p.toFixed(2)}</span>
+        </div>
       </div>
-      <div class="gauge-ticks">${tk}</div>
-      <div class="gauge-labels">
-        <span>Legitimate (≤ 0.15)</span>
-        <span>Uncertain · Verify (R1)</span>
-        <span>Fraud (≥ 0.85)</span>
+      <div class="gauge-markers">${ticks}</div>
+      <div class="gauge-regions">
+        <span>Legitimate (&le; 0.15)</span>
+        <span>Review / Policy Loop (0.15 - 0.85)</span>
+        <span>Fraud (&ge; 0.85)</span>
       </div>
     </div>`;
 }
 
-function actList(list){
+function actList(list) {
+  if (!list || !list.length) return `<p style="color:var(--text-tertiary);font-size:11.5px;">No actions specified.</p>`;
   return list.map(x => `
-    <div class="act">
-      <div class="h">
+    <div class="action-item">
+      <div class="action-item-header">
         <b>${x.action}</b>
-        <span class="chip ${x.route}">${x.route === "auto" ? "Autonomous" : x.route === "L1" ? "Team Lead" : "Fraud Manager"}</span>
+        <span class="chip route-${x.route}">${x.route === "auto" ? "Autonomous" : x.route === "L1" ? "Team Lead" : "Manager (L2)"}</span>
       </div>
       <p>${esc(x.reason)}</p>
     </div>`).join("");
 }
 
-function timeline(tr){
+function timeline(tr) {
   return tr.map(s => `
-    <div class="st ${s.kind}">
-      <span class="n">${s.step}</span>
-      <span class="tm">${s.t}s</span>
-      <b>${esc(s.title)}</b>
-      <p>${esc(s.detail)}</p>
+    <div class="timeline-step ${s.kind}">
+      <span class="step-badge">${s.step}</span>
+      <span class="step-time">${s.t}s</span>
+      <span class="step-title">${esc(s.title)}</span>
+      <p class="step-detail">${esc(s.detail)}</p>
     </div>`).join("");
 }
 
-function graphSvg(a){
+function graphSvg(a) {
   const c = a.case, W = 620, H = 360, cx = W / 2, cy = H / 2;
   const nodes = [], edges = [];
-  const add = (id, label, x, y, col, r = 8) => { nodes.push({id, label, x, y, col, r}); };
+  const add = (id, label, x, y, col, r = 8) => { nodes.push({ id, label, x, y, col, r }); };
 
-  add("card", "card", cx, cy, "var(--sys-orange)", 15);
+  add("card", "Card", cx, cy, "var(--sb-brand)", 14);
   const tx = (c.affected_txn_ids.length ? c.affected_txn_ids : []).slice(0, 8);
   tx.forEach((t, i) => {
     const ang = -Math.PI / 2 + (i - (tx.length - 1) / 2) * 0.55;
     const x = cx + Math.cos(ang) * 135, y = cy + Math.sin(ang) * 125;
-    add("t" + t, t, x, y, "var(--sys-red)", 8);
+    add("t" + t, t, x, y, "var(--sb-red)", 8);
     edges.push(["card", "t" + t, "MADE"]);
   });
 
   const dev = (c.connected_device_profiles || [])[0];
-  if (dev){
-    add("dev", "Device", cx - 210, cy + 10, "var(--sys-purple)", 12);
+  if (dev) {
+    add("dev", "Device", cx - 210, cy + 10, "var(--sb-purple)", 12);
     tx.slice(0, 3).forEach(t => edges.push(["t" + t, "dev", "FROM_DEVICE"]));
   }
 
   const cc = (c.connected_card_ids || []).slice(0, 5);
   cc.forEach((k, i) => {
     const y = 50 + i * (H - 100) / Math.max(cc.length - 1, 1);
-    add("c" + k, k, 60, cc.length === 1 ? cy + 60 : y, "var(--sys-yellow)", 9);
+    add("c" + k, k, 60, cc.length === 1 ? cy + 60 : y, "var(--sb-amber)", 9);
     edges.push([dev ? "dev" : "card", "c" + k, "SHARES"]);
   });
 
   const sm = (c.similar_prior_cases || []).slice(0, 5);
   sm.forEach((k, i) => {
     const y = 50 + i * (H - 100) / Math.max(sm.length - 1, 1);
-    add("s" + k, k, W - 60, y, "var(--sys-blue)", 9);
+    add("s" + k, k, W - 60, y, "var(--sb-blue)", 9);
     edges.push(["card", "s" + k, "SIMILAR"]);
   });
 
   const P = Object.fromEntries(nodes.map(n => [n.id, n]));
-  const es = edges.filter(e => P[e[0]] && P[e[1]]).map(([a, b, l]) =>
-    `<line x1="${P[a].x}" y1="${P[a].y}" x2="${P[b].x}" y2="${P[b].y}" stroke="${l === "SIMILAR" ? "rgba(10,132,255,0.4)" : "rgba(255,255,255,0.15)"}" stroke-width="1.5" ${l === "SIMILAR" ? 'stroke-dasharray="4 4"' : ""}/>`
+  const es = edges.filter(e => P[e[0]] && P[e[1]]).map(([u, v, l]) =>
+    `<line x1="${P[u].x}" y1="${P[u].y}" x2="${P[v].x}" y2="${P[v].y}" stroke="${l === "SIMILAR" ? "rgba(59,130,246,0.4)" : "rgba(255,255,255,0.14)"}" stroke-width="1.5" ${l === "SIMILAR" ? 'stroke-dasharray="4 4"' : ""}/>`
   ).join("");
 
   const ns = nodes.map(n => `
     <g>
-      <circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="${n.col}" fill-opacity="0.9" stroke="#0c0c0e" stroke-width="2.5"/>
-      <text class="lbl" x="${n.x}" y="${n.y + n.r + 13}" text-anchor="middle" fill="var(--text-secondary)" font-family="var(--font-mono)" font-size="10.5">${esc(n.label)}</text>
+      <circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="${n.col}" fill-opacity="0.9" stroke="#121212" stroke-width="2.5"/>
+      <text class="lbl" x="${n.x}" y="${n.y + n.r + 12}" text-anchor="middle" fill="var(--text-secondary)" font-family="var(--font-mono)" font-size="10.5">${esc(n.label)}</text>
     </g>`).join("");
 
   return `
-    <svg viewBox="0 0 ${W} ${H}" width="100%" style="background:rgba(0,0,0,0.35);border-radius:12px;border:1px solid var(--border-subtle)">
+    <svg viewBox="0 0 ${W} ${H}" width="100%" style="background:rgba(0,0,0,0.4);border-radius:var(--radius-md);border:1px solid var(--border-subtle)">
       ${es}${ns}
       <g font-size="10" font-family="var(--font-system)">
-        <circle cx="20" cy="${H-16}" r="4.5" fill="var(--sys-yellow)"/>
-        <text fill="var(--text-tertiary)" x="30" y="${H-13}">Shared Cards</text>
-        <circle cx="130" cy="${H-16}" r="4.5" fill="var(--sys-red)"/>
-        <text fill="var(--text-tertiary)" x="140" y="${H-13}">Episode Txns</text>
-        <circle cx="240" cy="${H-16}" r="4.5" fill="var(--sys-blue)"/>
-        <text fill="var(--text-tertiary)" x="250" y="${H-13}">Prior Closed Cases</text>
+        <circle cx="20" cy="${H - 15}" r="4" fill="var(--sb-amber)"/>
+        <text fill="var(--text-tertiary)" x="30" y="${H - 12}">Shared Cards</text>
+        <circle cx="130" cy="${H - 15}" r="4" fill="var(--sb-red)"/>
+        <text fill="var(--text-tertiary)" x="140" y="${H - 12}">Episode Txns</text>
+        <circle cx="240" cy="${H - 15}" r="4" fill="var(--sb-blue)"/>
+        <text fill="var(--text-tertiary)" x="250" y="${H - 12}">Prior Cases</text>
       </g>
     </svg>`;
 }
 
-function copySar(){
+function copySar() {
   const text = document.querySelector("#sar-text")?.innerText;
   if (!text) return;
   navigator.clipboard.writeText(text).then(() => {
-    const b = document.querySelector("#sar-copy-btn");
-    if (b) { b.textContent = "Copied!"; setTimeout(() => b.textContent = "Copy Narrative", 1800); }
+    showToast("SAR narrative copied to clipboard");
   });
 }
 
-function view(meta, a){
+function copyCaseJson(caseId) {
+  fetch("/api/cases/" + caseId).then(r => r.json()).then(data => {
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => {
+      showToast("Case JSON payload copied");
+    });
+  });
+}
+
+function view(meta, a) {
   const c = a.case, n = a.next_best_actions;
   $("#main").innerHTML = header(meta, a) + `
-    <div class="kpis">
-      <div class="kpi">
-        <label>Fraud Probability</label>
-        <b style="color:${c.fraud_probability>=.7?"var(--sys-red)":c.fraud_probability<=.3?"var(--sys-green)":"var(--sys-orange)"}">${c.fraud_probability.toFixed(2)}</b>
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <span class="kpi-label">Fraud Probability</span>
+        <div class="kpi-val" style="color:${c.fraud_probability >= 0.7 ? "var(--sb-red)" : c.fraud_probability <= 0.3 ? "var(--sb-brand)" : "var(--sb-amber)"}">${c.fraud_probability.toFixed(2)}</div>
       </div>
-      <div class="kpi">
-        <label>Exposure</label>
-        <b>${money(c.exposure_usd)}</b>
+      <div class="kpi-card">
+        <span class="kpi-label">Financial Exposure</span>
+        <div class="kpi-val">${money(c.exposure_usd)}</div>
       </div>
-      <div class="kpi">
-        <label>Affected Txns</label>
-        <b>${c.affected_txn_ids.length}</b>
+      <div class="kpi-card">
+        <span class="kpi-label">Affected Txns</span>
+        <div class="kpi-val">${c.affected_txn_ids.length}</div>
       </div>
-      <div class="kpi">
-        <label>Regulatory SAR</label>
-        <b style="color:${a.sar.file?"var(--sys-red)":"var(--text-secondary)"}">${a.sar.file ? "FILE (L2)" : "Not Required"}</b>
+      <div class="kpi-card">
+        <span class="kpi-label">Regulatory SAR</span>
+        <div class="kpi-val" style="color:${a.sar.file ? "var(--sb-red)" : "var(--text-secondary)"}">${a.sar.file ? "Required (L2)" : "Not Required"}</div>
       </div>
-      <div class="kpi">
-        <label>Graph Calls · Tokens</label>
-        <b>${a.tool_calls} · ${a.tokens}</b>
+      <div class="kpi-card">
+        <span class="kpi-label">Graph Calls &middot; Tokens</span>
+        <div class="kpi-val">${a.tool_calls} &middot; ${a.tokens}</div>
       </div>
-      <div class="kpi">
-        <label>Latency</label>
-        <b>${a.latency_s}s</b>
+      <div class="kpi-card">
+        <span class="kpi-label">Latency</span>
+        <div class="kpi-val">${a.latency_s}s</div>
       </div>
     </div>
 
     <div class="detail-grid">
       <div>
         <div class="card">
-          <h2>Uncertainty &amp; Calibrated Verdict <em>Stop rule: p ≥ 0.85 or ≤ 0.15</em></h2>
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              Calibrated Verdict
+            </span>
+            <span class="card-subtitle">Stop threshold: p &ge; 0.85 or &le; 0.15</span>
+          </div>
           ${gauge(c.fraud_probability)}
-          <div style="font-size:13px;line-height:1.5;color:var(--text-primary)">${esc(c.summary)}</div>
+          <div style="font-size:12.5px;line-height:1.5;color:var(--text-primary)">${esc(c.summary)}</div>
           ${c.pattern_description ? `
             <div class="callout" style="margin-top:12px">
-              <b>Undocumented Pattern Identified</b><br>${esc(c.pattern_description)}
+              <b>Undocumented Pattern Identified:</b><br>${esc(c.pattern_description)}
             </div>` : ""}
         </div>
 
         <div class="card">
-          <h2>Next Best Action <em>Policy Rules R1 – R10</em></h2>
-          <div class="acts">
-            <div><h4>Initial Policy Evaluation</h4>${actList(n.initial)}</div>
-            <div><h4>Post-Evidence Verdict</h4>${actList(n.final)}</div>
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Policy Recommendations
+            </span>
+            <span class="card-subtitle">Policy rules R1 &ndash; R10</span>
           </div>
-          ${a.evidence_requests.length ? `
+          <div class="action-grid">
+            <div class="action-column">
+              <h4>Initial Policy</h4>
+              ${actList(n.initial)}
+            </div>
+            <div class="action-column">
+              <h4>Post-Evidence Verdict</h4>
+              ${actList(n.final)}
+            </div>
+          </div>
+          ${a.evidence_requests && a.evidence_requests.length ? `
             <div class="callout">
-              <b>Evidence Requested:</b> ${a.evidence_requests.map(r=>pretty(r.type)+" — "+esc(r.assumed_response)).join("; ")}
+              <b>Evidence Requested:</b> ${a.evidence_requests.map(r => pretty(r.type) + " &mdash; " + esc(r.assumed_response)).join("; ")}
             </div>` : ""}
           <div class="callout success">
             <b>Action Differential:</b> ${esc(n.what_changed)}
@@ -1066,54 +1574,88 @@ function view(meta, a){
         </div>
 
         <div class="card">
-          <h2>Agent Reasoning Trace</h2>
-          <ul class="rs">${(a.reasoning||[]).map(r=>`<li>${esc(r)}</li>`).join("")}</ul>
-          <p style="color:var(--text-tertiary);margin:12px 0 0;font-size:12px"><b>Stop condition satisfied:</b> ${esc(a.stop_reason)}</p>
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              Reasoning Trace
+            </span>
+          </div>
+          <ul class="reasoning-list">${(a.reasoning || []).map(r => `<li>${esc(r)}</li>`).join("")}</ul>
+          <p style="color:var(--text-tertiary);margin:12px 0 0;font-size:11.5px"><b>Stop condition:</b> ${esc(a.stop_reason)}</p>
         </div>
 
         <div class="card">
-          <h2>Suspicious Activity Report (FinCEN SAR) <em>${a.sar.file ? "FILE_REPORT · Requires L2 Approval" : "Report Not Triggered"}</em></h2>
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Suspicious Activity Report (FinCEN SAR)
+            </span>
+            <span class="card-subtitle">${a.sar.file ? "Requires L2 Approval" : "Not Triggered"}</span>
+          </div>
           ${a.sar.file ? `
             <div class="sar-box">
               <button class="sar-copy-btn" id="sar-copy-btn" onclick="copySar()">Copy Narrative</button>
-              <pre class="sar" id="sar-text">${esc(a.sar.narrative)}</pre>
+              <pre class="sar-text" id="sar-text">${esc(a.sar.narrative)}</pre>
             </div>
-            <p style="color:var(--text-tertiary);font-size:11.5px;margin-top:8px">Subjects: ${a.sar.subjects.map(esc).join(", ")} · Total: ${money(a.sar.total_amount_usd)} · Span: ${a.sar.activity_dates.join(" → ")}</p>`
-            : `<p style="color:var(--text-secondary);font-size:12.5px">${esc(a.sar.reason)}</p>`}
+            <p style="color:var(--text-tertiary);font-size:11px;margin-top:8px">Subjects: ${a.sar.subjects.map(esc).join(", ")} &middot; Total: ${money(a.sar.total_amount_usd)} &middot; Period: ${a.sar.activity_dates.join(" &rarr; ")}</p>`
+            : `<p style="color:var(--text-secondary);font-size:12px">${esc(a.sar.reason)}</p>`}
         </div>
       </div>
 
       <div>
         <div class="card">
-          <h2>Live Streamed Trace <em id="live">${(a.trace||[]).length} steps</em></h2>
-          <div class="tl" id="tl">${timeline(a.trace||[])}</div>
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Investigation Trace
+            </span>
+            <span class="card-subtitle" id="live">${(a.trace || []).length} steps</span>
+          </div>
+          <div class="timeline" id="tl">${timeline(a.trace || [])}</div>
         </div>
 
         <div class="card">
-          <h2>Subgraph Topology <em>${esc(c.graph_case_id)}</em></h2>
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Subgraph Topology
+            </span>
+            <span class="card-subtitle">${esc(c.graph_case_id)}</span>
+          </div>
           ${graphSvg(a)}
         </div>
 
         <div class="card">
-          <h2>Grounding Evidence <em>${c.evidence.length} facts</em></h2>
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+              Grounding Evidence
+            </span>
+            <span class="card-subtitle">${c.evidence.length} items</span>
+          </div>
           ${c.evidence.map(e => `
-            <div class="ev">
-              <span class="src ${e.source}">${e.source}</span>
+            <div class="evidence-row">
+              <span class="source-badge ${e.source}">${e.source}</span>
               <div>
-                <div class="claim">${esc(e.claim)}</div>
-                <div class="ref">${esc(e.ref)}</div>
-                ${e.entity_ids.length ? `<div class="ids">${e.entity_ids.slice(0, 10).map(i=>`<span>${esc(i)}</span>`).join("")}</div>` : ""}
+                <div class="evidence-claim">${esc(e.claim)}</div>
+                <div class="evidence-ref">${esc(e.ref)}</div>
+                ${e.entity_ids.length ? `<div class="evidence-tags">${e.entity_ids.slice(0, 10).map(i => `<span class="evidence-tag">${esc(i)}</span>`).join("")}</div>` : ""}
               </div>
             </div>`).join("")}
         </div>
 
         <div class="card">
-          <h2>Case Memory (TigerGraph Vector Retrieval)</h2>
-          ${(c.similar_prior_cases||[]).map(i => `
-            <div class="mem">
-              <span class="cid">${i}</span>
-              <span style="color:var(--text-tertiary)">Closed historical case · vector match</span>
-            </div>`).join("") || "<p style='color:var(--text-tertiary);font-size:12px'>No prior precedent cases matched.</p>"}
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+              Case Memory Retrieval
+            </span>
+          </div>
+          ${(c.similar_prior_cases || []).map(i => `
+            <div class="memory-row">
+              <span class="memory-cid">${i}</span>
+              <span style="color:var(--text-tertiary)">Closed historical case &middot; vector match</span>
+            </div>`).join("") || "<p style='color:var(--text-tertiary);font-size:11.5px'>No prior precedent cases matched.</p>"}
         </div>
       </div>
     </div>`;
@@ -1123,33 +1665,39 @@ function view(meta, a){
   if (g) g.textContent = meta.card_id;
 }
 
-async function run(meta){
+async function run(meta) {
   const b = $("#run");
   b.disabled = true;
-  b.innerHTML = '<span class="spin"></span>Investigating…';
-  $("#main").querySelectorAll(".detail-grid, .kpis").forEach(e => e.remove());
+  b.innerHTML = '<span class="spinner"></span> Investigating&hellip;';
+  $("#main").querySelectorAll(".detail-grid, .kpi-row").forEach(e => e.remove());
   let tl = $("#tl");
-  if (!tl){
+  if (!tl) {
     $("#main").insertAdjacentHTML("beforeend", `
       <div class="card">
-        <h2>Live Streamed Trace <em id="live">Streaming…</em></h2>
-        <div class="tl" id="tl"></div>
+        <div class="card-header">
+          <span class="card-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Investigation Trace
+          </span>
+          <span class="card-subtitle" id="live">Streaming&hellip;</span>
+        </div>
+        <div class="timeline" id="tl"></div>
       </div>`);
     tl = $("#tl");
   }
   tl.innerHTML = "";
-  $("#live").textContent = "Streaming live from TigerGraph…";
+  $("#live").textContent = "Streaming live from TigerGraph&hellip;";
 
-  try{
-    const res = await fetch("/api/investigate/" + meta.case_id, {method: "POST"});
+  try {
+    const res = await fetch("/api/investigate/" + meta.case_id, { method: "POST" });
     const rd = res.body.getReader(), dec = new TextDecoder();
     let buf = "";
-    while(true){
-      const {value, done} = await rd.read();
+    while (true) {
+      const { value, done } = await rd.read();
       if (done) break;
-      buf += dec.decode(value, {stream: true});
+      buf += dec.decode(value, { stream: true });
       let i;
-      while((i = buf.indexOf("\n\n")) >= 0){
+      while ((i = buf.indexOf("\n\n")) >= 0) {
         const blk = buf.slice(0, i);
         buf = buf.slice(i + 2);
         const ev = /event: (\w+)/.exec(blk)?.[1];
@@ -1157,34 +1705,75 @@ async function run(meta){
         if (!dataMatch) continue;
         const data = JSON.parse(dataMatch[1]);
         if (ev === "step") tl.insertAdjacentHTML("beforeend", timeline([data]));
-        if (ev === "done"){
+        if (ev === "done") {
           CASES = await (await fetch("/api/cases")).json();
+          updateFilterCounts();
           renderList();
           view(CASES.find(c => c.case_id === meta.case_id), data);
+          showToast("Investigation complete");
         }
-        if (ev === "error"){
+        if (ev === "error") {
           tl.insertAdjacentHTML("beforeend", `
-            <div class="st stop">
-              <span class="n">!</span>
-              <b>Investigation Error</b>
-              <p>${esc(data.error)}</p>
+            <div class="timeline-step stop">
+              <span class="step-badge">!</span>
+              <span class="step-title">Investigation Error</span>
+              <p class="step-detail">${esc(data.error)}</p>
             </div>`);
           b.disabled = false;
           b.innerHTML = 'Retry Investigation';
         }
       }
     }
-  }catch(err){
+  } catch (err) {
     tl.insertAdjacentHTML("beforeend", `
-      <div class="st stop">
-        <span class="n">!</span>
-        <b>Connection Error</b>
-        <p>${esc(err.message)}</p>
+      <div class="timeline-step stop">
+        <span class="step-badge">!</span>
+        <span class="step-title">Connection Error</span>
+        <p class="step-detail">${esc(err.message)}</p>
       </div>`);
     b.disabled = false;
     b.innerHTML = 'Retry Investigation';
   }
 }
+
+// Keyboard shortcuts for investigator workflow
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+    if (e.key === "Escape") {
+      e.target.blur();
+    }
+    return;
+  }
+
+  if (e.key === "/" || ((e.metaKey || e.ctrlKey) && e.key === "k")) {
+    e.preventDefault();
+    $("#search").focus();
+    $("#search").select();
+    return;
+  }
+
+  const filtered = getFilteredCases();
+  if (!filtered.length) return;
+
+  const curIdx = filtered.findIndex(c => c.case_id === CUR);
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    const nextIdx = curIdx < filtered.length - 1 ? curIdx + 1 : 0;
+    openCase(filtered[nextIdx].case_id);
+    const el = $(`[data-id="${filtered[nextIdx].case_id}"]`);
+    if (el) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    const prevIdx = curIdx > 0 ? curIdx - 1 : filtered.length - 1;
+    openCase(filtered[prevIdx].case_id);
+    const el = $(`[data-id="${filtered[prevIdx].case_id}"]`);
+    if (el) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  } else if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+    const runBtn = $("#run");
+    if (runBtn && !runBtn.disabled) runBtn.click();
+  }
+});
 
 boot();
 </script>
