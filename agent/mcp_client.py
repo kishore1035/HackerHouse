@@ -42,7 +42,11 @@ class MCPGraphClient(GraphClient):
 
     def _run_loop(self, env: dict, ready: Future):
         asyncio.set_event_loop(self._loop)
-        self._loop.run_until_complete(self._worker(env, ready))
+        try:
+            self._loop.run_until_complete(self._worker(env, ready))
+        except Exception as e:
+            if not ready.done():
+                ready.set_exception(e)
 
     async def _worker(self, env: dict, ready: Future):
         from mcp import ClientSession, StdioServerParameters

@@ -1,0 +1,1688 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FraudGraph Agent · Enterprise Fraud Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Strict Monochrome Enterprise Palette */
+  --bg-app: #000000;
+  --bg-sidebar: #09090b;
+  --bg-header: #09090b;
+  --bg-card: #0d0d10;
+  --bg-card-hover: #141418;
+  --bg-subtle: #17171a;
+  --bg-subtle-hover: #222227;
+  --bg-input: #000000;
+
+  /* Strict Monochrome Grayscale Borders */
+  --border-primary: #27272a;
+  --border-subtle: #18181b;
+  --border-hover: #3f3f46;
+  --border-focus: #ffffff;
+
+  /* Typography Contrast - Fully WCAG AA Compliant (≥4.5:1 on #000000, #09090b, #17171a) */
+  --text-primary: #ffffff;
+  --text-secondary: #e4e4e7;
+  --text-tertiary: #a1a1aa;
+  --text-muted: #9ca3af;
+
+  /* Monochrome Functional Accents */
+  --mono-white: #ffffff;
+  --mono-black: #000000;
+  --mono-gray-dark: #27272a;
+  --mono-gray-light: #e4e4e7;
+
+  /* Form & Geometry */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", "SF Mono", ui-monospace, Menlo, Monaco, Consolas, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font: 14px/1.5 var(--font-sans);
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* Base Layout */
+.app {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: 48px 1fr;
+  height: 100vh;
+  background: var(--bg-app);
+}
+
+/* Header Bar */
+header {
+  grid-column: 1 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-primary);
+  z-index: 30;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-xs);
+  background: #ffffff;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.brand-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: #000000;
+  stroke-width: 2.2;
+}
+
+.brand-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.brand-title h1 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+.brand-title span {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* Header Telemetry Metrics */
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.telemetry-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border-radius: var(--radius-xs);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.telemetry-item svg {
+  width: 12px;
+  height: 12px;
+  stroke: var(--text-secondary);
+  fill: none;
+  stroke-width: 2;
+}
+.telemetry-item b {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sidebar & Navigation */
+aside {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-primary);
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.sidebar-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.sidebar-title-row h2 {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.queue-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+}
+
+/* Search Box */
+.search-container {
+  position: relative;
+  margin-bottom: 8px;
+}
+.search-container svg.search-icon {
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  stroke: var(--text-tertiary);
+  fill: none;
+  stroke-width: 2;
+}
+.search-container input {
+  width: 100%;
+  padding: 6px 48px 6px 28px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  font: 12px var(--font-sans);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.search-container input:focus {
+  border-color: var(--border-focus);
+}
+.search-container input::placeholder {
+  color: var(--text-muted);
+}
+.search-actions {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.search-clear-btn {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  display: none;
+  padding: 2px;
+}
+.search-clear-btn:hover { color: #ffffff; }
+.search-clear-btn svg { width: 11px; height: 11px; stroke: currentColor; stroke-width: 2; }
+.search-shortcut {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  background: var(--bg-subtle);
+  color: var(--text-tertiary);
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid var(--border-primary);
+}
+
+/* Strict Monochrome Segmented Control */
+.segmented-control {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #000000;
+  padding: 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-primary);
+  gap: 6px;
+}
+.segment-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  font: 500 12px var(--font-sans);
+  padding: 6px 4px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.12s ease;
+}
+.segment-btn svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+.segment-btn:hover {
+  color: #ffffff;
+  background: var(--bg-subtle);
+}
+.segment-btn.active {
+  background: #ffffff;
+  color: #000000;
+  font-weight: 700;
+}
+.segment-btn.active svg { stroke: #000000; }
+.segment-btn .count-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+/* Case List */
+.case-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px;
+}
+.case-item {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  gap: 2px 8px;
+  padding: 8px 10px;
+  margin-bottom: 2px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  align-items: center;
+  border: 1px solid transparent;
+  transition: all 0.12s ease;
+}
+.case-item:hover {
+  background: var(--bg-subtle);
+  border-color: var(--border-primary);
+}
+.case-item.on {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+}
+.case-item.on * {
+  color: #000000 !important;
+}
+.case-item .item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  grid-row: 1 / 3;
+}
+.case-item .item-icon svg {
+  width: 13px;
+  height: 13px;
+  stroke: var(--text-tertiary);
+  fill: none;
+  stroke-width: 2;
+}
+.case-item.on .item-icon svg {
+  stroke: #000000;
+}
+.case-item .case-id-text {
+  font-weight: 700;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+.case-item .case-prob-text {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--text-secondary);
+}
+.case-item .case-meta-sub {
+  grid-column: 2;
+  color: var(--text-tertiary);
+  font-size: 10.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Main Workspace */
+main {
+  overflow-y: auto;
+  padding: 20px 24px 60px;
+  background: #000000;
+}
+
+.empty-state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 32px 24px;
+}
+.empty-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.empty-header-row svg {
+  width: 20px;
+  height: 20px;
+  stroke: #ffffff;
+  fill: none;
+  stroke-width: 2;
+}
+.empty-state h2 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.empty-state p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  max-width: 480px;
+  line-height: 1.55;
+}
+
+/* Detail Case Top Bar */
+.case-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-primary);
+}
+.case-info {
+  flex: 1;
+  min-width: 320px;
+}
+.case-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.case-cid {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+.case-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Monochrome Badges / Chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+.chip svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+.chip.fraud {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+}
+.chip.legitimate {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid var(--border-hover);
+}
+.chip.uncertain {
+  background: var(--bg-subtle);
+  color: #ffffff;
+  border: 1px dashed var(--border-hover);
+}
+.chip.route-auto {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+}
+.chip.route-L1 {
+  background: var(--bg-subtle);
+  color: #ffffff;
+  border: 1px solid var(--border-hover);
+}
+.chip.route-L2 {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+  font-weight: 700;
+}
+
+.trigger-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 860px;
+}
+.case-meta-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+.case-meta-line .sep { opacity: 0.35; }
+.case-meta-line b { font-family: var(--font-mono); color: var(--text-secondary); }
+
+.case-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Monochrome Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+  border-radius: var(--radius-xs);
+  padding: 6px 14px;
+  font: 600 12px var(--font-sans);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+.btn:hover {
+  background: #e4e4e7;
+  border-color: #e4e4e7;
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: wait;
+}
+.btn svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+  fill: currentColor;
+}
+.btn.ghost {
+  background: var(--bg-subtle);
+  color: #ffffff;
+  border: 1px solid var(--border-primary);
+}
+.btn.ghost:hover {
+  background: var(--bg-subtle-hover);
+  border-color: var(--border-hover);
+}
+.btn.ghost svg {
+  fill: none;
+  stroke-width: 2;
+}
+
+/* KPI Metrics Grid */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-xs);
+  padding: 10px 12px;
+  transition: border-color 0.12s ease;
+}
+.kpi-card:hover {
+  border-color: var(--border-hover);
+}
+.kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.kpi-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.kpi-icon svg {
+  width: 13px;
+  height: 13px;
+  stroke: var(--text-tertiary);
+  fill: none;
+  stroke-width: 2;
+}
+.kpi-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+/* Detail Split Grid */
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 14px;
+}
+@media (max-width: 1200px) {
+  .detail-grid { grid-template-columns: 1fr; }
+  .app { grid-template-columns: 280px 1fr; }
+}
+
+/* Card Surface */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-xs);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.card-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.card-title svg {
+  width: 13px;
+  height: 13px;
+  stroke: #ffffff;
+  fill: none;
+  stroke-width: 2;
+}
+.card-subtitle {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-tertiary);
+}
+
+/* Monochrome Precision Gauge */
+.gauge-container {
+  margin: 14px 0 20px;
+}
+.gauge-track {
+  position: relative;
+  height: 8px;
+  background: #18181b;
+  border-radius: 4px;
+  border: 1px solid var(--border-primary);
+}
+.gauge-pointer {
+  position: absolute;
+  top: -4px;
+  width: 3px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 1px;
+  transition: left 0.3s ease;
+}
+.gauge-badge {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 700;
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  background: #ffffff;
+  color: #000000;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.gauge-markers {
+  position: relative;
+  height: 14px;
+  margin-top: 5px;
+}
+.gauge-marker {
+  position: absolute;
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  transform: translateX(-50%);
+}
+.gauge-regions {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-tertiary);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  margin-top: 4px;
+}
+
+/* Callout Box */
+.callout {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-left: 2px solid #ffffff;
+  background: var(--bg-subtle);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.callout b { color: #ffffff; }
+
+/* Action Recommendations */
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 900px) { .action-grid { grid-template-columns: 1fr; } }
+.action-column h4 {
+  margin: 0 0 8px;
+  font-size: 10.5px;
+  color: var(--text-tertiary);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.action-item {
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-xs);
+  padding: 9px 11px;
+  margin-bottom: 8px;
+  background: #000000;
+}
+.action-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.action-item-header b {
+  font: 700 11.5px var(--font-mono);
+  color: #ffffff;
+}
+.action-item p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Reasoning Trace */
+.reasoning-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-secondary);
+}
+.reasoning-list li {
+  margin: 5px 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* FinCEN SAR Box */
+.sar-box { position: relative; }
+.sar-text {
+  white-space: pre-wrap;
+  font: 12.5px/1.6 var(--font-mono);
+  color: #e4e4e7;
+  margin: 0;
+  background: #000000;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-xs);
+  padding: 12px 14px;
+}
+.sar-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-primary);
+  color: #ffffff;
+  font: 600 12px var(--font-sans);
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sar-copy-btn:hover { background: var(--bg-subtle-hover); border-color: var(--border-hover); }
+.sar-copy-btn svg { width: 11px; height: 11px; stroke: #ffffff; fill: none; stroke-width: 2; }
+
+/* Timeline Steps */
+.timeline {
+  position: relative;
+  margin-left: 4px;
+  padding-left: 14px;
+  border-left: 1px solid var(--border-primary);
+}
+.timeline-step {
+  position: relative;
+  padding: 0 0 14px 16px;
+}
+.step-badge {
+  position: absolute;
+  left: -20px;
+  top: 1px;
+  width: 15px;
+  height: 15px;
+  border-radius: 2px;
+  background: #000000;
+  border: 1px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #ffffff;
+}
+.step-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+.step-detail {
+  margin: 2px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.step-time {
+  float: right;
+  color: var(--text-tertiary);
+  font: 10.5px var(--font-mono);
+}
+
+/* Grounding Evidence */
+.evidence-row {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 11.5px;
+  align-items: flex-start;
+}
+.evidence-row:last-child { border-bottom: 0; }
+.source-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  border-radius: 3px;
+  text-align: center;
+  font-family: var(--font-mono);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+}
+.evidence-claim {
+  font-size: 12px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+.evidence-ref {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+.evidence-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.evidence-tag {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  background: #000000;
+  border: 1px solid var(--border-primary);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--text-secondary);
+}
+
+/* Case Memory */
+.memory-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 11.5px;
+}
+.memory-row:last-child { border: 0; }
+.memory-cid { font: 700 11.5px var(--font-mono); color: #ffffff; }
+
+/* Monochrome Toast */
+.toast {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-30px);
+  background: #ffffff;
+  color: #000000;
+  border-radius: var(--radius-xs);
+  padding: 6px 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+.toast svg {
+  width: 12px;
+  height: 12px;
+  stroke: #000000;
+  fill: none;
+  stroke-width: 2.5;
+}
+
+/* Clean Scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #000000; }
+::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="header-left">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      </div>
+      <div class="brand-title">
+        <h1>FraudGraph Agent</h1>
+        <span>TigerGraph Knowledge Graph · Deterministic Policy</span>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <aside>
+    <div class="sidebar-header">
+      <div class="sidebar-title-row">
+        <h2>Alert Queue</h2>
+        <span class="queue-badge" id="queue-count">0</span>
+      </div>
+      <div class="search-container">
+        <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="search" placeholder="Filter alerts (ID, card, type)..." oninput="handleSearch()">
+        <div class="search-actions">
+          <button class="search-clear-btn" id="search-clear" onclick="clearSearch()" title="Clear">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+          </button>
+          <span class="search-shortcut">/</span>
+        </div>
+      </div>
+
+      <div class="segmented-control" role="tablist">
+        <button class="segment-btn active" data-filter="all" onclick="setFilter('all')">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          All <span class="count-badge" id="count-all">0</span>
+        </button>
+        <button class="segment-btn" data-filter="fraud" onclick="setFilter('fraud')">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Fraud <span class="count-badge" id="count-fraud">0</span>
+        </button>
+        <button class="segment-btn" data-filter="uncertain" onclick="setFilter('uncertain')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+          Review <span class="count-badge" id="count-uncertain">0</span>
+        </button>
+        <button class="segment-btn" data-filter="legitimate" onclick="setFilter('legitimate')">
+          <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Legit <span class="count-badge" id="count-legit">0</span>
+        </button>
+      </div>
+    </div>
+    <div class="case-list" id="list" role="listbox"></div>
+  </aside>
+
+  <main id="main">
+    <div class="empty-state">
+      <div class="empty-header-row">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <h2>Select an Alert to Investigate</h2>
+      </div>
+      <p>Autonomous graph traversal across 590k+ transactions. Models calibrated on historical closed cases with strict policy rule enforcement.</p>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money = n => "$" + Number(n||0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const pretty = s => String(s||"").replaceAll("_", " ");
+
+let CASES = [], CUR = null, CURRENT_FILTER = "all", SEARCH_QUERY = "";
+
+function showToast(msg) {
+  const t = $("#toast");
+  $("#toast-msg").textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+async function boot() {
+  try {
+    CASES = await (await fetch("/api/cases")).json();
+    updateFilterCounts();
+    renderList();
+
+    const s = await (await fetch("/api/stats")).json();
+    $("#stats").innerHTML = `
+      <div class="telemetry-item" title="Transactions in Knowledge Graph">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span>Txns</span><b>${(s.transactions||0).toLocaleString()}</b>
+      </div>
+      <div class="telemetry-item" title="Card Entities">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span>Cards</span><b>${(s.cards||0).toLocaleString()}</b>
+      </div>
+      <div class="telemetry-item" title="Historical Closed Cases">
+        <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Closed</span><b>${(s.closed_cases||0).toLocaleString()}</b>
+      </div>
+      <div class="telemetry-item" title="Agent Memory Cases">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Memory</span><b>${s.agent_cases||0}</b>
+      </div>
+      <div class="telemetry-item" title="Average Latency">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Latency</span><b>${s.avg_latency||0}s</b>
+      </div>`;
+  } catch (e) {
+    console.error("Boot error:", e);
+  }
+  const h = location.hash.slice(1);
+  if (h) openCase(h);
+}
+
+function updateFilterCounts() {
+  $("#count-all").textContent = CASES.length;
+  $("#count-fraud").textContent = CASES.filter(c => c.verdict === "fraud").length;
+  $("#count-uncertain").textContent = CASES.filter(c => c.verdict === "uncertain" || !c.verdict).length;
+  $("#count-legit").textContent = CASES.filter(c => c.verdict === "legitimate").length;
+}
+
+function setFilter(filter) {
+  CURRENT_FILTER = filter;
+  document.querySelectorAll(".segment-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.filter === filter);
+  });
+  renderList();
+}
+
+function handleSearch() {
+  SEARCH_QUERY = ($("#search").value || "").trim().toLowerCase();
+  $("#search-clear").style.display = SEARCH_QUERY ? "flex" : "none";
+  renderList();
+}
+
+function clearSearch() {
+  $("#search").value = "";
+  handleSearch();
+  $("#search").focus();
+}
+
+function getFilteredCases() {
+  return CASES.filter(c => {
+    const verdict = c.verdict || "uncertain";
+    if (CURRENT_FILTER !== "all" && verdict !== CURRENT_FILTER) return false;
+    if (SEARCH_QUERY) {
+      const matchId = (c.case_id || "").toLowerCase().includes(SEARCH_QUERY);
+      const matchCard = (c.card_id || "").toLowerCase().includes(SEARCH_QUERY);
+      const matchPattern = (c.pattern || "").toLowerCase().includes(SEARCH_QUERY);
+      const matchTrigger = (c.trigger_type || "").toLowerCase().includes(SEARCH_QUERY);
+      if (!matchId && !matchCard && !matchPattern && !matchTrigger) return false;
+    }
+    return true;
+  });
+}
+
+function renderList() {
+  const filtered = getFilteredCases();
+  $("#queue-count").textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    $("#list").innerHTML = `<div style="padding:24px 12px;text-align:center;color:var(--text-muted);font-size:13px;">NO ALERTS MATCH CRITERIA</div>`;
+    return;
+  }
+
+  $("#list").innerHTML = filtered.map(c => {
+    const isFraud = c.verdict === "fraud";
+    const isLegit = c.verdict === "legitimate";
+    const iconSvg = isFraud 
+      ? `<svg viewBox="0 0 24 24"><polygon points="12 2 15 8 22 9 17 14 18 21 12 17 6 21 7 14 2 9 9 8 12 2"/></svg>`
+      : isLegit 
+      ? `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`
+      : `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+
+    return `
+      <div class="case-item ${CUR === c.case_id ? "on" : ""}"
+           onclick="openCase('${c.case_id}')"
+           role="option"
+           aria-selected="${CUR === c.case_id}"
+           tabindex="0"
+           data-id="${c.case_id}">
+        <span class="item-icon">${iconSvg}</span>
+        <span class="case-id-text">${c.case_id}</span>
+        <span class="case-prob-text">${c.probability != null ? (c.probability * 100).toFixed(0) + "%" : "N/A"}</span>
+        <span class="case-meta-sub">${pretty(c.trigger_type)} &middot; ${esc(c.card_id)}${c.pattern && c.pattern !== "none" ? " &middot; " + pretty(c.pattern) : ""}</span>
+      </div>`;
+  }).join("");
+}
+
+async function openCase(id) {
+  CUR = id;
+  location.hash = id;
+  renderList();
+  const meta = CASES.find(c => c.case_id === id);
+  if (!meta) return;
+  try {
+    const r = await fetch("/api/cases/" + id);
+    if (r.ok) view(meta, await r.json());
+    else shell(meta);
+  } catch (e) {
+    shell(meta);
+  }
+}
+
+function shell(meta) {
+  $("#main").innerHTML = header(meta) + `
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">
+          <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          Investigation Trace
+        </span>
+        <span class="card-subtitle" id="live">INITIALIZED</span>
+      </div>
+      <div class="timeline" id="tl"></div>
+    </div>`;
+  $("#run").onclick = () => run(meta);
+}
+
+function header(meta, a) {
+  const c = a && a.case;
+  return `
+    <div class="case-top-bar">
+      <div class="case-info">
+        <div class="case-title-row">
+          <span class="case-cid">${meta.case_id}</span>
+          ${c ? `
+            <div class="case-chips">
+              <span class="chip ${c.verdict}">${c.verdict}</span>
+              <span class="chip">${pretty(c.status)}</span>
+              ${c.pattern && c.pattern !== "none" ? `<span class="chip">${pretty(c.pattern)}</span>` : ""}
+            </div>
+          ` : ""}
+        </div>
+        <div class="trigger-text">${esc(meta.trigger_text)}</div>
+        <div class="case-meta-line">
+          <span>TRIGGER: <b>${pretty(meta.trigger_type).toUpperCase()}</b></span>
+          <span class="sep">&middot;</span>
+          <span>OPENED: <b>${esc(meta.opened_at)}</b></span>
+          <span class="sep">&middot;</span>
+          <span>FLAGGED TXN: <b>${meta.flagged_txn_id}</b></span>
+          <span class="sep">&middot;</span>
+          <span>CARD: <b>${esc(meta.card_id)}</b></span>
+          ${meta.risk_score != null ? `<span class="sep">&middot;</span><span>BANK RISK: <b>${meta.risk_score}</b></span>` : ""}
+        </div>
+      </div>
+      <div class="case-actions">
+        ${a ? `
+          <button class="btn ghost" id="copy-json-btn" onclick="copyCaseJson('${meta.case_id}')" title="Copy Case Payload">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy JSON
+          </button>
+        ` : ""}
+        <button class="btn" id="run">
+          <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          ${a ? "Re-run Investigation" : "Execute Investigation"}
+        </button>
+      </div>
+    </div>`;
+}
+
+function gauge(p) {
+  const ticks = [[15, "0.15"], [30, "0.30"], [70, "0.70"], [85, "0.85"]].map(([l, t]) =>
+    `<span class="gauge-marker" style="left:${l}%">${t}</span>`
+  ).join("");
+  return `
+    <div class="gauge-container">
+      <div class="gauge-track">
+        <div class="gauge-pointer" style="left:${Math.max(1, Math.min(99, p * 100))}%">
+          <span class="gauge-badge">${p.toFixed(2)}</span>
+        </div>
+      </div>
+      <div class="gauge-markers">${ticks}</div>
+      <div class="gauge-regions">
+        <span>[ &le; 0.15 CLEAR ]</span>
+        <span>[ 0.15 &ndash; 0.85 INVESTIGATE ]</span>
+        <span>[ &ge; 0.85 FRAUD ]</span>
+      </div>
+    </div>`;
+}
+
+function actList(list) {
+  if (!list || !list.length) return `<div style="color:var(--text-muted);font-size:12px;font-family:var(--font-mono);padding:4px 0;">NONE SPECIFIED</div>`;
+  return list.map(x => `
+    <div class="action-item">
+      <div class="action-item-header">
+        <b>${x.action}</b>
+        <span class="chip route-${x.route}">${x.route === "auto" ? "AUTONOMOUS" : x.route === "L1" ? "L1 LEAD" : "L2 MANAGER"}</span>
+      </div>
+      <p>${esc(x.reason)}</p>
+    </div>`).join("");
+}
+
+function timeline(tr) {
+  return tr.map(s => `
+    <div class="timeline-step">
+      <span class="step-badge">${s.step}</span>
+      <span class="step-time">${s.t}s</span>
+      <span class="step-title">${esc(s.title)}</span>
+      <p class="step-detail">${esc(s.detail)}</p>
+    </div>`).join("");
+}
+
+function graphSvg(a) {
+  const c = a.case, W = 620, H = 340, cx = W / 2, cy = H / 2;
+  const nodes = [], edges = [];
+  const add = (id, label, x, y, type, r = 8) => { nodes.push({ id, label, x, y, type, r }); };
+
+  add("card", "Card " + (c.graph_case_id || ""), cx, cy, "card", 13);
+  const tx = (c.affected_txn_ids.length ? c.affected_txn_ids : []).slice(0, 8);
+  tx.forEach((t, i) => {
+    const ang = -Math.PI / 2 + (i - (tx.length - 1) / 2) * 0.55;
+    const x = cx + Math.cos(ang) * 135, y = cy + Math.sin(ang) * 115;
+    add("t" + t, "TX " + t, x, y, "txn", 7);
+    edges.push(["card", "t" + t, "MADE"]);
+  });
+
+  const dev = (c.connected_device_profiles || [])[0];
+  if (dev) {
+    add("dev", "Device", cx - 210, cy + 10, "dev", 11);
+    tx.slice(0, 3).forEach(t => edges.push(["t" + t, "dev", "FROM_DEVICE"]));
+  }
+
+  const cc = (c.connected_card_ids || []).slice(0, 5);
+  cc.forEach((k, i) => {
+    const y = 45 + i * (H - 90) / Math.max(cc.length - 1, 1);
+    add("c" + k, k, 60, cc.length === 1 ? cy + 50 : y, "shared", 8);
+    edges.push([dev ? "dev" : "card", "c" + k, "SHARES"]);
+  });
+
+  const sm = (c.similar_prior_cases || []).slice(0, 5);
+  sm.forEach((k, i) => {
+    const y = 45 + i * (H - 90) / Math.max(sm.length - 1, 1);
+    add("s" + k, k, W - 60, y, "precedent", 8);
+    edges.push(["card", "s" + k, "SIMILAR"]);
+  });
+
+  const P = Object.fromEntries(nodes.map(n => [n.id, n]));
+  const es = edges.filter(e => P[e[0]] && P[e[1]]).map(([u, v, l]) =>
+    `<line x1="${P[u].x}" y1="${P[u].y}" x2="${P[v].x}" y2="${P[v].y}" 
+           stroke="${l === "SIMILAR" ? "#52525b" : "#3f3f46"}" 
+           stroke-width="1.2" 
+           ${l === "SIMILAR" ? 'stroke-dasharray="3 3"' : l === "SHARES" ? 'stroke-dasharray="2 2"' : ""}/>`
+  ).join("");
+
+  const ns = nodes.map(n => {
+    const isCard = n.type === "card";
+    const isTxn = n.type === "txn";
+    const isDev = n.type === "dev";
+    const isPrecedent = n.type === "precedent";
+
+    if (isCard) {
+      return `
+        <g>
+          <circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="#ffffff" stroke="#000000" stroke-width="2"/>
+          <text x="${n.x}" y="${n.y + n.r + 12}" text-anchor="middle" fill="#ffffff" font-family="var(--font-mono)" font-size="9.5" font-weight="700">${esc(n.label)}</text>
+        </g>`;
+    }
+    if (isTxn) {
+      return `
+        <g>
+          <circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="#000000" stroke="#ffffff" stroke-width="1.8"/>
+          <text x="${n.x}" y="${n.y + n.r + 11}" text-anchor="middle" fill="#a1a1aa" font-family="var(--font-mono)" font-size="9">${esc(n.label)}</text>
+        </g>`;
+    }
+    if (isDev) {
+      return `
+        <g>
+          <rect x="${n.x - 9}" y="${n.y - 9}" width="18" height="18" fill="#18181b" stroke="#a1a1aa" stroke-width="1.5"/>
+          <text x="${n.x}" y="${n.y + 19}" text-anchor="middle" fill="#a1a1aa" font-family="var(--font-mono)" font-size="9">${esc(n.label)}</text>
+        </g>`;
+    }
+    return `
+      <g>
+        <circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="#27272a" stroke="#71717a" stroke-width="1.2"/>
+        <text x="${n.x}" y="${n.y + n.r + 11}" text-anchor="middle" fill="#71717a" font-family="var(--font-mono)" font-size="8.5">${esc(n.label)}</text>
+      </g>`;
+  }).join("");
+
+  return `
+    <svg viewBox="0 0 ${W} ${H}" width="100%" style="background:#000000;border-radius:var(--radius-xs);border:1px solid var(--border-primary)">
+      ${es}${ns}
+      <g font-size="9" font-family="var(--font-mono)">
+        <circle cx="20" cy="${H - 14}" r="3.5" fill="#ffffff"/>
+        <text fill="var(--text-tertiary)" x="30" y="${H - 11}">CARD</text>
+        <circle cx="80" cy="${H - 14}" r="3.5" fill="#000000" stroke="#ffffff" stroke-width="1.5"/>
+        <text fill="var(--text-tertiary)" x="90" y="${H - 11}">FLAGGED TXN</text>
+        <rect x="180" y="${H - 18}" width="7" height="7" fill="#18181b" stroke="#a1a1aa" stroke-width="1"/>
+        <text fill="var(--text-tertiary)" x="193" y="${H - 11}">DEVICE</text>
+        <circle cx="255" cy="${H - 14}" r="3.5" fill="#27272a" stroke="#71717a"/>
+        <text fill="var(--text-tertiary)" x="265" y="${H - 11}">PRECEDENT / SHARED</text>
+      </g>
+    </svg>`;
+}
+
+function copySar() {
+  const text = document.querySelector("#sar-text")?.innerText;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector("#sar-copy-btn");
+    if (btn) {
+      const orig = btn.innerHTML;
+      btn.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> COPIED`;
+      setTimeout(() => { btn.innerHTML = orig; }, 1800);
+    }
+    showToast("SAR narrative copied to clipboard");
+  });
+}
+
+function copyCaseJson(caseId) {
+  fetch("/api/cases/" + caseId).then(r => r.json()).then(data => {
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => {
+      const btn = document.querySelector("#copy-json-btn");
+      if (btn) {
+        btn.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> COPIED`;
+        setTimeout(() => {
+          btn.innerHTML = `<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy JSON`;
+        }, 1800);
+      }
+      showToast("Case JSON copied to clipboard");
+    });
+  });
+}
+
+function view(meta, a) {
+  const c = a.case, n = a.next_best_actions;
+  $("#main").innerHTML = header(meta, a) + `
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Fraud Probability</span>
+          <span class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg></span>
+        </div>
+        <div class="kpi-val">${c.fraud_probability.toFixed(2)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Exposure</span>
+          <span class="kpi-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+        </div>
+        <div class="kpi-val">${money(c.exposure_usd)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Affected Txns</span>
+          <span class="kpi-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
+        </div>
+        <div class="kpi-val">${c.affected_txn_ids.length}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Regulatory SAR</span>
+          <span class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+        </div>
+        <div class="kpi-val">${a.sar.file ? "MANDATORY" : "EXEMPT"}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Graph &middot; Tokens</span>
+          <span class="kpi-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg></span>
+        </div>
+        <div class="kpi-val">${a.tool_calls} &middot; ${a.tokens}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Duration</span>
+          <span class="kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+        </div>
+        <div class="kpi-val">${a.latency_s}s</div>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+              Calibrated Verdict
+            </span>
+            <span class="card-subtitle">THRESHOLD: P &ge; 0.85 OR &le; 0.15</span>
+          </div>
+          ${gauge(c.fraud_probability)}
+          <div style="font-size:12.5px;line-height:1.55;color:var(--text-primary)">${esc(c.summary)}</div>
+          ${c.pattern_description ? `
+            <div class="callout">
+              <b>UNDOCUMENTED PATTERN DETECTED:</b><br>${esc(c.pattern_description)}
+            </div>` : ""}
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              Policy Recommendations
+            </span>
+            <span class="card-subtitle">RULES R1 &ndash; R10</span>
+          </div>
+          <div class="action-grid">
+            <div class="action-column">
+              <h4>Initial Evaluation</h4>
+              ${actList(n.initial)}
+            </div>
+            <div class="action-column">
+              <h4>Post-Evidence Verdict</h4>
+              ${actList(n.final)}
+            </div>
+          </div>
+          ${a.evidence_requests && a.evidence_requests.length ? `
+            <div class="callout">
+              <b>EVIDENCE GATHERED:</b> ${a.evidence_requests.map(r => pretty(r.type).toUpperCase() + ": " + esc(r.assumed_response)).join("; ")}
+            </div>` : ""}
+          <div class="callout">
+            <b>ACTION PROGRESSION:</b> ${esc(n.what_changed)}
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              Agent Reasoning Trace
+            </span>
+          </div>
+          <ul class="reasoning-list">${(a.reasoning || []).map(r => `<li>${esc(r)}</li>`).join("")}</ul>
+          <div style="color:var(--text-tertiary);margin:10px 0 0;font-size:12px;font-family:var(--font-mono)">STOP CONDITION: ${esc(a.stop_reason)}</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Suspicious Activity Report (FinCEN SAR)
+            </span>
+            <span class="card-subtitle">${a.sar.file ? "REQUIRES L2 APPROVAL" : "EXEMPT"}</span>
+          </div>
+          ${a.sar.file ? `
+            <div class="sar-box">
+              <button class="sar-copy-btn" id="sar-copy-btn" onclick="copySar()">
+                <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy SAR
+              </button>
+              <pre class="sar-text" id="sar-text">${esc(a.sar.narrative)}</pre>
+            </div>
+            <div style="color:var(--text-tertiary);font-size:12px;font-family:var(--font-mono);margin-top:6px">SUBJECTS: ${a.sar.subjects.map(esc).join(", ")} &middot; TOTAL: ${money(a.sar.total_amount_usd)} &middot; DATES: ${a.sar.activity_dates.join(" &rarr; ")}</div>`
+            : `<p style="color:var(--text-secondary);font-size:13px">${esc(a.sar.reason)}</p>`}
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Investigation Trace
+            </span>
+            <span class="card-subtitle" id="live">${(a.trace || []).length} STEPS</span>
+          </div>
+          <div class="timeline" id="tl">${timeline(a.trace || [])}</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Subgraph Topology
+            </span>
+            <span class="card-subtitle">${esc(c.graph_case_id)}</span>
+          </div>
+          ${graphSvg(a)}
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              Grounding Evidence
+            </span>
+            <span class="card-subtitle">${c.evidence.length} FACTS</span>
+          </div>
+          ${c.evidence.map(e => `
+            <div class="evidence-row">
+              <span class="source-badge">${e.source}</span>
+              <div>
+                <div class="evidence-claim">${esc(e.claim)}</div>
+                <div class="evidence-ref">${esc(e.ref)}</div>
+                ${e.entity_ids.length ? `<div class="evidence-tags">${e.entity_ids.slice(0, 10).map(i => `<span class="evidence-tag">${esc(i)}</span>`).join("")}</div>` : ""}
+              </div>
+            </div>`).join("")}
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+              Case Memory Retrieval
+            </span>
+            <span class="card-subtitle">VECTOR MATCH</span>
+          </div>
+          ${(c.similar_prior_cases || []).map(i => `
+            <div class="memory-row">
+              <span class="memory-cid">${i}</span>
+              <span style="color:var(--text-tertiary)">Closed historical case &middot; cosine vector similarity</span>
+            </div>`).join("") || "<p style='color:var(--text-muted);font-size:13px'>No prior precedent cases matched.</p>"}
+        </div>
+      </div>
+    </div>`;
+
+  $("#run").onclick = () => run(meta);
+}
+
+async function run(meta) {
+  const b = $("#run");
+  b.disabled = true;
+  b.innerHTML = '<svg viewBox="0 0 24 24" style="animation:spin 0.8s linear infinite"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="16 16"/></svg> Investigating...';
+  $("#main").querySelectorAll(".detail-grid, .kpi-row").forEach(e => e.remove());
+  let tl = $("#tl");
+  if (!tl) {
+    $("#main").insertAdjacentHTML("beforeend", `
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">
+            <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            Investigation Trace
+          </span>
+          <span class="card-subtitle" id="live">STREAMING</span>
+        </div>
+        <div class="timeline" id="tl"></div>
+      </div>`);
+    tl = $("#tl");
+  }
+  tl.innerHTML = "";
+  $("#live").textContent = "EXECUTING QUERY STREAM FROM TIGERGRAPH...";
+
+  try {
+    const res = await fetch("/api/investigate/" + meta.case_id, { method: "POST" });
+    const rd = res.body.getReader(), dec = new TextDecoder();
+    let buf = "";
+    while (true) {
+      const { value, done } = await rd.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let i;
+      while ((i = buf.indexOf("\n\n")) >= 0) {
+        const blk = buf.slice(0, i);
+        buf = buf.slice(i + 2);
+        const ev = /event: (\w+)/.exec(blk)?.[1];
+        const dataMatch = /data: (.*)/s.exec(blk);
+        if (!dataMatch) continue;
+        const data = JSON.parse(dataMatch[1]);
+        if (ev === "step") tl.insertAdjacentHTML("beforeend", timeline([data]));
+        if (ev === "done") {
+          CASES = await (await fetch("/api/cases")).json();
+          updateFilterCounts();
+          renderList();
+          view(CASES.find(c => c.case_id === meta.case_id), data);
+          showToast("Investigation complete");
+        }
+        if (ev === "error") {
+          tl.insertAdjacentHTML("beforeend", `
+            <div class="timeline-step">
+              <span class="step-badge">!</span>
+              <span class="step-title">Investigation Error</span>
+              <p class="step-detail">${esc(data.error)}</p>
+            </div>`);
+          b.disabled = false;
+          b.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Retry';
+        }
+      }
+    }
+  } catch (err) {
+    tl.insertAdjacentHTML("beforeend", `
+      <div class="timeline-step">
+        <span class="step-badge">!</span>
+        <span class="step-title">Connection Error</span>
+        <p class="step-detail">${esc(err.message)}</p>
+      </div>`);
+    b.disabled = false;
+    b.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Retry';
+  }
+}
+
+// Global Key Commands
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+    if (e.key === "Escape") e.target.blur();
+    return;
+  }
+  if (e.key === "/" || ((e.metaKey || e.ctrlKey) && e.key === "k")) {
+    e.preventDefault();
+    $("#search").focus();
+    $("#search").select();
+    return;
+  }
+  const filtered = getFilteredCases();
+  if (!filtered.length) return;
+  const curIdx = filtered.findIndex(c => c.case_id === CUR);
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    const nextIdx = curIdx < filtered.length - 1 ? curIdx + 1 : 0;
+    openCase(filtered[nextIdx].case_id);
+    const el = $(`[data-id="${filtered[nextIdx].case_id}"]`);
+    if (el) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    const prevIdx = curIdx > 0 ? curIdx - 1 : filtered.length - 1;
+    openCase(filtered[prevIdx].case_id);
+    const el = $(`[data-id="${filtered[prevIdx].case_id}"]`);
+    if (el) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  } else if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+    const runBtn = $("#run");
+    if (runBtn && !runBtn.disabled) runBtn.click();
+  }
+});
+
+boot();
+</script>
+</body>
+</html>
