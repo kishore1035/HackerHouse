@@ -1,3 +1,11 @@
+---
+title: Building FraudGraph Agent: Autonomous Fraud Investigation & Policy-Compliant Next-Best Action with TigerGraph
+published: true
+description: How we combined TigerGraph 4.2.5, Model Context Protocol (MCP), calibrated Graph ML, Vector GraphRAG, and deterministic policy enforcement to build an enterprise-grade autonomous fraud investigator.
+tags: tigergraph, ai, python, machinelearning
+canonical_url: https://github.com/kishore1035/HackerHouse
+---
+
 # Building FraudGraph Agent: Autonomous Fraud Investigation & Policy-Compliant Next-Best Action with TigerGraph
 
 *How we combined TigerGraph 4.2.5, Model Context Protocol (MCP), calibrated Graph ML, Vector GraphRAG, and deterministic policy enforcement to build an enterprise-grade autonomous fraud investigator.*
@@ -19,10 +27,26 @@ To solve this, we engineered **FraudGraph Agent** for the **TigerGraph x Hacker 
 
 FraudGraph Agent is an autonomous, graph-native fraud investigator that takes raw alerts, navigates a 590,000+ transaction TigerGraph knowledge graph, diagnoses the exact fraud typology, gathers multi-source evidence, enforces a deterministic policy engine for next-best actions, drafts regulatory FinCEN Suspicious Activity Reports (SARs), and writes its findings back into graph memory.
 
-Here is the complete architectural breakdown of how it works.
-
-![FraudGraph Agent Dashboard - Live Investigation Cockpit](screenshots/01_main_dashboard.png)
-*Figure 1: The FraudGraph Agent analyst dashboard displaying the real-time alert queue, live investigation timeline, calibrated uncertainty gauge, and dynamic next-best action evolution.*
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│ FraudGraph Agent Analyst Dashboard                                      │
+├───────────────┬─────────────────────────────────────────────────────────┤
+│ Alert Queue   │ Case Details & Live Investigation Stream                │
+│  - HHG-001    │ ┌─────────────────────────────────────────────────────┐ │
+│  - HHG-006    │ │ Live Streamed Timeline             [Steps 1 to 8]   │ │
+│  - HHG-018    │ ├─────────────────────────────────────────────────────┤ │
+│               │ │ Uncertainty & Calibrated Verdict                    │ │
+│ Filters:      │ │   Stop Rule: p >= 0.85 or p <= 0.15     [0.92 FRAUD]│ │
+│  - All (20)   │ ├─────────────────────────────────────────────────────┤ │
+│  - Fraud (10) │ │ Next Best Action Evolution                          │ │
+│  - Legit (10) │ │   Initial: VERIFY_WITH_CUSTOMER -> Final: BLOCK_CARD│ │
+│               │ ├─────────────────────────────────────────────────────┤ │
+│ Stats:        │ │ Subgraph Topology & Grounding Evidence              │ │
+│  - 590k Txns  │ │   Grounded Facts: 14 | Prior Cases: 5 | Ring Hops: 2│ │
+│  - 14.8k Cards│ ├─────────────────────────────────────────────────────┤ │
+│  - 5.5k Cases │ │ Case Memory Loop (TigerGraph Vector Retrieval)      │ │
+└───────────────┴─┴─────────────────────────────────────────────────────┴─┘
+```
 
 ---
 
@@ -85,9 +109,6 @@ The foundational design principle of FraudGraph Agent is strict separation of co
 
 By decoupling action execution from LLM generation, FraudGraph Agent guarantees that regulatory requirements (such as mandatory SAR filing over $1,000 exposure or senior manager sign-off for card freezes) can never be bypassed by model drift or prompt injection.
 
-![FraudGraph Agent How It Works Guide & Investigation Lifecycle](screenshots/02_how_it_works_modal.png)
-*Figure 2: The interactive architecture and policy guide embedded within the dashboard, detailing the 8-step pipeline, rules R1–R10, and approval routing hierarchies.*
-
 ---
 
 ## 1. The Graph Foundation: TigerGraph 4.2.5
@@ -122,9 +143,6 @@ Rather than performing slow relational table joins, our investigator issues high
 - `device_txns` & `device_closed_cases`: Traverses 2 hops to identify if a physical device has participated in confirmed fraud on other accounts.
 - `ring_expand`: Performs multi-hop BFS across shared cards, devices, and email domains to uncover coordinated fraud syndicates.
 
-![Interactive Subgraph Topology Visualizing Multi-Hop Transaction and Device Ring Context](screenshots/04_topology_subgraph.png)
-*Figure 3: Interactive Subgraph Topology visualization rendering cards, device profiles, transactions, and connected fraud rings directly from TigerGraph.*
-
 ---
 
 ## 2. Standardizing Graph Access via Model Context Protocol (MCP)
@@ -135,6 +153,14 @@ Through a persistent stdio JSON-RPC session, the agent treats the graph as a fir
 - **Graph Queries**: Reads execute via `tigergraph__run_installed_query` and `tigergraph__get_node`.
 - **Graph Mutation**: Investigated case memory writes back through `tigergraph__add_node` and `tigergraph__add_edge`.
 - **High-Availability Fallback**: The client automatically senses environment readiness, falling back to direct pyTigerGraph connections when running against managed TigerGraph Cloud instances.
+
+```python
+# The agent executes GSQL queries seamlessly through standard MCP tool calls:
+session.call_tool("tigergraph__run_installed_query", {
+    "query_name": "card_txns",
+    "params": {"c": card_id}
+})
+```
 
 ---
 
@@ -216,10 +242,13 @@ To provide investigators with an exceptional operational experience, we built a 
 - **Calibrated Uncertainty Gauge**: Visualizes exact fraud confidence against the $0.15$ and $0.85$ policy action thresholds.
 - **Action Evolution Panel**: Explicitly compares Initial Actions against Final Actions, highlighting exactly why and how evidence shifted the decision.
 - **Interactive Subgraph Topology**: Canvas-based interactive exploration of cards, devices, and connected transactions.
-- **GRIP GraphRAG Studio**: An embedded comparison harness that pits Direct LLM Generation vs. Vector-only RAG vs. Agentic TigerGraph Multi-Hop GraphRAG side-by-side, proving how graph traversal eliminates hallucinations.
+- **GRIP GraphRAG Studio**: An embedded comparison harness that pits Direct LLM Generation vs. Vector-only RAG vs. Agentic TigerGraph Multi-Hop GraphRAG side-by-side:
 
-![GRIP GraphRAG Studio - Direct LLM vs Vector RAG vs TigerGraph Agentic Traversal](screenshots/06_grip_graphrag_studio.png)
-*Figure 4: The GRIP GraphRAG Studio comparing Pipeline 1 (Direct LLM), Pipeline 2 (Vector RAG), and Pipeline 3 (Agentic Multi-Hop GraphRAG) with cryptographic entity provenance.*
+| Pipeline | Retrieval Method | Grounding Source | Hallucination Risk | Relational Context |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Direct LLM** | None (Parametric) | Internal weights | High | Zero |
+| **2. Vector RAG** | Cosine similarity | Flat text chunks | Medium | None (isolated chunks) |
+| **3. Agentic GraphRAG** | Autonomous BFS Traversal | Multi-hop Graph Topology | **Zero (Cryptographically Verified)** | **Full Ring Context** |
 
 ---
 
@@ -249,8 +278,5 @@ The entire repository—including the TigerGraph schema, GSQL queries, training 
 
 - **GitHub Repository**: [kishore1035/HackerHouse](https://github.com/kishore1035/HackerHouse)
 - **Tech Stack**: TigerGraph 4.2.5, TigerGraph MCP, Python, FastAPI, React, Vite, OmniRoute, PyTigerGraph.
-
-![Hacker House Goa Submission - FraudGraph Agent](screenshots/07_splash_intro.png)
-*Figure 5: FraudGraph Agent presentation splashscreen designed for the TigerGraph Hacker House Goa challenge.*
 
 *Built for the TigerGraph Hacker House Goa Challenge.*
