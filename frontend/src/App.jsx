@@ -5,9 +5,13 @@ import EmptyState from './components/EmptyState';
 import CaseDetail from './components/CaseDetail';
 import Toast from './components/Toast';
 import SplashScreen from './components/SplashScreen';
+import GripGraphRAG from './components/GripGraphRAG';
+import HelpModal from './components/HelpModal';
 
 export default function App() {
+  const [activeView, setActiveView] = useState('investigation');
   const [showSplash, setShowSplash] = useState(true);
+  const [showGuide, setShowGuide] = useState(false);
   const [cases, setCases] = useState([]);
   const [stats, setStats] = useState({
     transactions: 590742,
@@ -250,23 +254,33 @@ export default function App() {
   }, [cases, selectedId]);
 
   return (
-    <div className="app">
-      <Header stats={stats} onShowSplash={() => setShowSplash(true)} />
-
-      <Sidebar
-        cases={filteredCases}
-        selectedId={selectedId}
-        onSelectCase={handleSelectCase}
-        currentFilter={currentFilter}
-        onSetFilter={setCurrentFilter}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onClearSearch={() => setSearchQuery('')}
-        filterCounts={filterCounts}
+    <div className={`app ${activeView === 'grip' ? 'view-grip' : ''}`}>
+      <Header
+        stats={stats}
+        onShowSplash={() => setShowSplash(true)}
+        activeView={activeView}
+        onSelectView={setActiveView}
+        onOpenGuide={() => setShowGuide(true)}
       />
 
-      <main id="main">
-        {!selectedMeta ? (
+      {activeView === 'investigation' && (
+        <Sidebar
+          cases={filteredCases}
+          selectedId={selectedId}
+          onSelectCase={handleSelectCase}
+          currentFilter={currentFilter}
+          onSetFilter={setCurrentFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onClearSearch={() => setSearchQuery('')}
+          filterCounts={filterCounts}
+        />
+      )}
+
+      <main id="main" className={activeView === 'grip' ? 'main-full' : ''}>
+        {activeView === 'grip' ? (
+          <GripGraphRAG onCopy={handleCopyJson} />
+        ) : !selectedMeta ? (
           <EmptyState />
         ) : (
           <CaseDetail
@@ -282,6 +296,8 @@ export default function App() {
       </main>
 
       <Toast message={toastMsg} isVisible={toastVisible} />
+
+      <HelpModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
 
       {showSplash && <SplashScreen onEnter={() => setShowSplash(false)} />}
     </div>

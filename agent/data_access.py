@@ -52,9 +52,33 @@ def load_frames(slim="/home/vinay/hackerhouse/data/slim/"):
 class GraphClient:
     """TigerGraph-backed client. Every call is an installed GSQL query; `calls` counts them for the answer file."""
 
-    def __init__(self, host="http://127.0.0.1", rest=9000, gs=14240, user="tigergraph", pw="tigergraph"):
+    def __init__(self, host=None, rest=None, gs=None, user=None, pw=None, graphname=None, gsql_secret=None):
+        import os
+        from dotenv import load_dotenv
+        load_dotenv()
         import pyTigerGraph as tg
-        self.conn = tg.TigerGraphConnection(host=host, restppPort=rest, gsPort=gs, username=user, password=pw, graphname="FraudGraph")
+        host = host or os.environ.get("TIGERGRAPH_HOST", "http://127.0.0.1")
+        graphname = graphname or os.environ.get("TIGERGRAPH_GRAPH_NAME", os.environ.get("TIGERGRAPH_GRAPHNAME", "Transaction_Fraud"))
+        gsql_secret = gsql_secret or os.environ.get("TIGERGRAPH_GSQL_SECRET", os.environ.get("TIGERGRAPH_SECRET"))
+        user = user or os.environ.get("TIGERGRAPH_USERNAME", "tigergraph")
+        pw = pw or os.environ.get("TIGERGRAPH_PASSWORD", "tigergraph")
+
+        self.conn = tg.TigerGraphConnection(
+            host=host,
+            restppPort=rest or (443 if host.startswith("https") else 9000),
+            gsPort=gs or (443 if host.startswith("https") else 14240),
+            username=user,
+            password=pw,
+            graphname=graphname,
+            gsqlSecret=gsql_secret or ""
+        )
+        if gsql_secret:
+            try:
+                res = self.conn.getToken(gsql_secret)
+                self.conn.apiToken = res[0] if isinstance(res, (tuple, list)) else res
+            except Exception as e:
+                import sys
+                print(f"Warning: Failed to fetch TigerGraph token with secret ({e})", file=sys.stderr)
         self.calls = 0
         self.log: list[str] = []
         self._cache: dict = {}

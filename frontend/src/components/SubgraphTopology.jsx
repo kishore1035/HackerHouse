@@ -63,9 +63,10 @@ export default function SubgraphTopology({ caseDetail }) {
         viewBox={`0 0 ${W} ${H}`}
         width="100%"
         style={{
-          background: '#ffffff',
-          borderRadius: 'var(--radius-xs)',
-          border: '1px solid var(--border-primary)',
+          background: '#FFFDF5',
+          borderRadius: 'var(--radius-sm)',
+          border: '2.5px solid #000000',
+          boxShadow: 'var(--shadow-brutal-xs)',
         }}
       >
         {edges
@@ -77,9 +78,9 @@ export default function SubgraphTopology({ caseDetail }) {
               y1={P[u].y}
               x2={P[v].x}
               y2={P[v].y}
-              stroke={l === 'SIMILAR' ? '#a1a1aa' : '#d4d4d8'}
-              strokeWidth="1.2"
-              strokeDasharray={l === 'SIMILAR' ? '3 3' : l === 'SHARES' ? '2 2' : undefined}
+              stroke="#000000"
+              strokeWidth="1.6"
+              strokeDasharray={l === 'SIMILAR' ? '4 3' : l === 'SHARES' ? '3 3' : undefined}
             />
           ))}
 
@@ -87,7 +88,25 @@ export default function SubgraphTopology({ caseDetail }) {
           if (n.type === 'card') {
             return (
               <g key={n.id}>
-                <circle cx={n.x} cy={n.y} r={n.r} fill="#000000" stroke="#ffffff" strokeWidth="2" />
+                <circle cx={n.x} cy={n.y} r={n.r} fill="#FFE600" stroke="#000000" strokeWidth="2.5" />
+                <text
+                  x={n.x}
+                  y={n.y + n.r + 13}
+                  textAnchor="middle"
+                  fill="#000000"
+                  fontFamily="var(--font-mono)"
+                  fontSize="10"
+                  fontWeight="800"
+                >
+                  {n.label}
+                </text>
+              </g>
+            );
+          }
+          if (n.type === 'txn') {
+            return (
+              <g key={n.id}>
+                <circle cx={n.x} cy={n.y} r={n.r} fill="#FF7675" stroke="#000000" strokeWidth="2" />
                 <text
                   x={n.x}
                   y={n.y + n.r + 12}
@@ -102,34 +121,18 @@ export default function SubgraphTopology({ caseDetail }) {
               </g>
             );
           }
-          if (n.type === 'txn') {
-            return (
-              <g key={n.id}>
-                <circle cx={n.x} cy={n.y} r={n.r} fill="#ffffff" stroke="#000000" strokeWidth="1.8" />
-                <text
-                  x={n.x}
-                  y={n.y + n.r + 11}
-                  textAnchor="middle"
-                  fill="#27272a"
-                  fontFamily="var(--font-mono)"
-                  fontSize="9"
-                >
-                  {n.label}
-                </text>
-              </g>
-            );
-          }
           if (n.type === 'dev') {
             return (
               <g key={n.id}>
-                <rect x={n.x - 9} y={n.y - 9} width="18" height="18" fill="#f4f4f5" stroke="#52525b" strokeWidth="1.5" />
+                <rect x={n.x - 10} y={n.y - 10} width="20" height="20" rx="3" fill="#55EFC4" stroke="#000000" strokeWidth="2" />
                 <text
                   x={n.x}
-                  y={n.y + 19}
+                  y={n.y + 20}
                   textAnchor="middle"
-                  fill="#27272a"
+                  fill="#000000"
                   fontFamily="var(--font-mono)"
-                  fontSize="9"
+                  fontSize="9.5"
+                  fontWeight="700"
                 >
                   {n.label}
                 </text>
@@ -138,14 +141,15 @@ export default function SubgraphTopology({ caseDetail }) {
           }
           return (
             <g key={n.id}>
-              <circle cx={n.x} cy={n.y} r={n.r} fill="#e4e4e7" stroke="#71717a" strokeWidth="1.2" />
+              <circle cx={n.x} cy={n.y} r={n.r} fill="#A29BFE" stroke="#000000" strokeWidth="1.8" />
               <text
                 x={n.x}
                 y={n.y + n.r + 11}
                 textAnchor="middle"
-                fill="#52525b"
+                fill="#1a1a1a"
                 fontFamily="var(--font-mono)"
-                fontSize="8.5"
+                fontSize="9"
+                fontWeight="600"
               >
                 {n.label}
               </text>
@@ -153,21 +157,21 @@ export default function SubgraphTopology({ caseDetail }) {
           );
         })}
 
-        <g fontSize="9" fontFamily="var(--font-mono)">
-          <circle cx="20" cy={H - 14} r="3.5" fill="#000000" />
-          <text fill="var(--text-tertiary)" x="30" y={H - 11}>
+        <g fontSize="9.5" fontFamily="var(--font-mono)" fontWeight="700">
+          <circle cx="20" cy={H - 14} r="4" fill="#FFE600" stroke="#000000" strokeWidth="1.5" />
+          <text fill="#000000" x="30" y={H - 11}>
             CARD
           </text>
-          <circle cx="80" cy={H - 14} r="3.5" fill="#ffffff" stroke="#000000" strokeWidth="1.5" />
-          <text fill="var(--text-tertiary)" x="90" y={H - 11}>
+          <circle cx="85" cy={H - 14} r="4" fill="#FF7675" stroke="#000000" strokeWidth="1.5" />
+          <text fill="#000000" x="96" y={H - 11}>
             FLAGGED TXN
           </text>
-          <rect x="180" y={H - 18} width="7" height="7" fill="#f4f4f5" stroke="#52525b" strokeWidth="1" />
-          <text fill="var(--text-tertiary)" x="193" y={H - 11}>
+          <rect x="200" y={H - 18} width="8" height="8" rx="2" fill="#55EFC4" stroke="#000000" strokeWidth="1.5" />
+          <text fill="#000000" x="214" y={H - 11}>
             DEVICE
           </text>
-          <circle cx="255" cy={H - 14} r="3.5" fill="#e4e4e7" stroke="#71717a" />
-          <text fill="var(--text-tertiary)" x="265" y={H - 11}>
+          <circle cx="280" cy={H - 14} r="4" fill="#A29BFE" stroke="#000000" strokeWidth="1.5" />
+          <text fill="#000000" x="291" y={H - 11}>
             PRECEDENT / SHARED
           </text>
         </g>

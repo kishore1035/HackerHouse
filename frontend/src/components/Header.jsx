@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Header({ stats, onShowSplash }) {
+export default function Header({ stats, onShowSplash, activeView, onSelectView, onOpenGuide }) {
   return (
     <header>
       <div className="header-left">
@@ -15,6 +15,23 @@ export default function Header({ stats, onShowSplash }) {
           <h1>FraudGraph Agent</h1>
           <span>TigerGraph Knowledge Graph &middot; Deterministic Policy</span>
         </div>
+
+        {onSelectView && (
+          <div className="header-nav-switch">
+            <button
+              className={`nav-switch-btn ${activeView === 'investigation' ? 'active' : ''}`}
+              onClick={() => onSelectView('investigation')}
+            >
+              INVESTIGATION QUEUE
+            </button>
+            <button
+              className={`nav-switch-btn ${activeView === 'grip' ? 'active' : ''}`}
+              onClick={() => onSelectView('grip')}
+            >
+              GRIP GRAPHRAG
+            </button>
+          </div>
+        )}
       </div>
       <div className="stats" id="stats">
         <div className="telemetry-item" title="Transactions in Knowledge Graph">
@@ -57,6 +74,20 @@ export default function Header({ stats, onShowSplash }) {
           <span>Latency</span>
           <b>{stats?.avg_latency || 0}s</b>
         </div>
+        {onOpenGuide && (
+          <button
+            className="telemetry-item guide-trigger-btn"
+            onClick={onOpenGuide}
+            title="Open 3-step beginner guide & glossary"
+          >
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <span>HOW IT WORKS</span>
+          </button>
+        )}
         {onShowSplash && (
           <button className="telemetry-item splash-trigger-btn" onClick={onShowSplash} title="Replay Hacker House Goa Intro">
             <svg viewBox="0 0 24 24">

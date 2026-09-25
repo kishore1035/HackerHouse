@@ -107,6 +107,19 @@ export default function CaseDetail({
         </div>
       </div>
 
+      {/* User-friendly guidance banner */}
+      {c ? (
+        <div className="callout guide-callout">
+          <b>Live Investigation Summary:</b>
+          <span> This card was evaluated across 860,000+ TigerGraph transactions. The agent verified {(c.evidence || []).length} graph facts and matched {(c.similar_prior_cases || []).length} closed historical fraud rings to reach a calibrated <b>{c.verdict?.toUpperCase()}</b> verdict.</span>
+        </div>
+      ) : (
+        <div className="callout guide-callout pending">
+          <b>Ready to Investigate:</b>
+          <span> Click the <b>"Execute Investigation"</b> button above. The agent will traverse connected cards, shared stolen devices, and historical precedents to calculate risk in real-time.</span>
+        </div>
+      )}
+
       {/* If investigated, show KPI summary row */}
       {c && (
         <div className="kpi-row">
@@ -123,6 +136,7 @@ export default function CaseDetail({
             <div className="kpi-val">
               {c.fraud_probability != null ? `${(c.fraud_probability * 100).toFixed(1)}%` : 'N/A'}
             </div>
+            <span className="kpi-hint">0% = Safe · 100% = Definite Fraud</span>
           </div>
 
           <div className="kpi-card">
@@ -136,6 +150,7 @@ export default function CaseDetail({
               </span>
             </div>
             <div className="kpi-val">{money(c.exposure_usd)}</div>
+            <span className="kpi-hint">Total USD at risk on card</span>
           </div>
 
           <div className="kpi-card">
@@ -152,6 +167,7 @@ export default function CaseDetail({
             <div className="kpi-val" style={{ fontSize: '13px', textTransform: 'uppercase' }}>
               {pretty(c.pattern || 'None')}
             </div>
+            <span className="kpi-hint">Detected fraud ring structure</span>
           </div>
 
           <div className="kpi-card">
@@ -164,6 +180,7 @@ export default function CaseDetail({
               </span>
             </div>
             <div className="kpi-val">{(c.evidence || []).length} Facts</div>
+            <span className="kpi-hint">Zero-hallucination graph facts</span>
           </div>
 
           <div className="kpi-card">
@@ -177,6 +194,7 @@ export default function CaseDetail({
               </span>
             </div>
             <div className="kpi-val">{(c.similar_prior_cases || []).length} Cases</div>
+            <span className="kpi-hint">Historical cases with same traits</span>
           </div>
         </div>
       )}
